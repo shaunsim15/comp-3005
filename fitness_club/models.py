@@ -1,0 +1,1 @@
+# This is where you define the models of your application. https://exploreflask.com/en/latest/organizing.html
