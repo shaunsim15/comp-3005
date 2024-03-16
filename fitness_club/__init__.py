@@ -1,51 +1,40 @@
 import os
 
 from flask import Flask
+from flask_sqlalchemy import SQLAlchemy
+from sqlalchemy import text # https://stackoverflow.com/questions/2268050/execute-sql-from-file-in-sqlalchemy
 
+import psycopg2
 
-def create_app(test_config=None):
-    """Create and configure an instance of the Flask application."""
-    app = Flask(__name__, instance_relative_config=True)
-    app.config.from_mapping(
-        # a default secret that should be overridden by instance config
-        SECRET_KEY="dev",
-        # store the database in the instance folder
-        DATABASE=os.path.join(app.instance_path, "flaskr.sqlite"),
-    )
+db = SQLAlchemy() # initialize our database object
 
-    if test_config is None:
-        # load the instance config, if it exists, when not testing
-        app.config.from_pyfile("config.py", silent=True)
-    else:
-        # load the test config if passed in
-        app.config.update(test_config)
+# Create and configure an instance of the Flask application.
+def create_app():
+    
+    app = Flask(__name__, template_folder='templates') # __name__ represents the name of file that was run. This is how you initialize flask. Also define the name of folder storing templates.
+    app.config['SECRET_KEY'] = 'thisissecret' # For all flask apps, this config variable secures cookies/session data related to our website. Can be any string. In prod, wouldnt wanna share this key w/ anyone, but for this app, it's fine.
 
-    # ensure the instance folder exists
-    try:
-        os.makedirs(app.instance_path)
-    except OSError:
-        pass
+    # Database data
+    username = "postgres"
+    password = "56789"
+    dbname = "fitness_club_project"
 
-    @app.route("/hello")
-    def hello():
-        return "Hello, World!"
+    # The location of our postgres database
+    app.config["SQLALCHEMY_DATABASE_URI"] = f"postgresql://{username}:{password}@localhost:5432/{dbname}" 
+    db.init_app(app) # Attach an instance of the SQLAlchemy class to our Flask app
 
-    # register the database commands
-    from . import db
+    # creates an app context, within which the Flask app and its configuratoins are available for use. Useful when working with Flask components outside fo regular request/response cycle.
+    with app.app_context():
+        with open("fitness_club/schema.sql", 'r') as f:
+            sql_commands = f.read()
+        db.session.execute(text(sql_commands))
+        db.session.commit()
 
-    db.init_app(app)
+    # import variables from files
+    from .session import session
 
-    # apply the blueprints to the app
-    from . import auth
-    from . import blog
+    # register the blueprints defined in various files. Usually urlprefix='/': if url_prefix='/auth/' and route was "hello", we must visit /auth/hello
+    app.register_blueprint(session, url_prefix='/')
 
-    app.register_blueprint(auth.bp)
-    app.register_blueprint(blog.bp)
-
-    # make url_for('index') == url_for('blog.index')
-    # in another app, you might define a separate main index here with
-    # app.route, while giving the blog blueprint a url_prefix, but for
-    # the tutorial the blog will be the main index
-    app.add_url_rule("/", endpoint="index")
 
     return app
