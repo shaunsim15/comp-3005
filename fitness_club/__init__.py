@@ -2,11 +2,13 @@ import os
 
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
+from flask_bcrypt import Bcrypt
 from sqlalchemy import text # https://stackoverflow.com/questions/2268050/execute-sql-from-file-in-sqlalchemy
 
 import psycopg2
 
 db = SQLAlchemy() # initialize our database object
+bcrypt = Bcrypt() # initialize our bcrypt object
 
 # Create and configure an instance of the Flask application.
 def create_app():

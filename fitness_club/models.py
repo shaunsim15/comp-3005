@@ -9,7 +9,7 @@ class Member(db.Model):
     first_name = db.Column(db.String(20))
     last_name = db.Column(db.String(20))
     email = db.Column(db.String(50), unique=True, nullable=False)
-    password = db.Column(db.String(60), nullable=False)
+    password = db.Column(db.String(255), nullable=False)
     goal_weight = db.Column(db.Numeric(5, 2))
     goal_date= db.Column(db.Date)
     height = db.Column(db.Numeric(5, 2))
@@ -21,7 +21,7 @@ class Trainer(db.Model):
     first_name = db.Column(db.String(20))
     last_name = db.Column(db.String(20))
     email = db.Column(db.String(50), unique=True, nullable=False)
-    password = db.Column(db.String(60), nullable=False)
+    password = db.Column(db.String(255), nullable=False)
 
 class Session(db.Model):
     __tablename__ = 'session'
@@ -48,11 +48,11 @@ class Room(db.Model):
     capacity = db.Column(db.Integer)
 
 
-class Trainer(db.Model):
-    __tablename__ = 'trainer'
+# class Trainer(db.Model):
+#     __tablename__ = 'trainer'
 
-    trainer_id = db.Column(db.Integer, primary_key=True)
-    first_name = db.Column(db.String(20))
-    last_name = db.Column(db.String(20))
-    email = db.Column(db.String(50))
-    password = db.Column(db.String(255))
+#     trainer_id = db.Column(db.Integer, primary_key=True)
+#     first_name = db.Column(db.String(20))
+#     last_name = db.Column(db.String(20))
+#     email = db.Column(db.String(50))
+#     password = db.Column(db.String(255))
