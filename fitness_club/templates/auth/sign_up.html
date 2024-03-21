@@ -1,55 +1,52 @@
 {% block content %}
-    <form method="GET">
-      <select name="user-role" id="user-role" onchange="this.form.submit()">
-        <option value = "" disabled selected>Select Your Role</option>
-        <option value="admin">Admin</option>
-        <option value="trainer">Trainer</option>
-        <option value="member">Member</option>
-    </form>
+<h1 align="center">Sign Up</h1>
+    <p> Sign up as:</p>
+    <a href="{{ url_for('auth.register', user_role='admin') }}">Admin</a>
+    <a href="{{ url_for('auth.register', user_role='trainer') }}">Trainer</a>
+    <a href="{{ url_for('auth.register', user_role='member') }}">Member</a>
 
-    {% if form %} 
+    {% if user_role %} 
       <form method="POST">
         {{ form.hidden_tag() }}
-        <h3 align="center">Sign Up</h3>
         <div class="form-group">
-          {{ form.username.label }}
-          {{ form.username(class="form-control") }}
-          <!-- {{ form.username.errors }} -->
+          {{ form.first_name.label }}
+          {{ form.first_name(class="form-control") }}
+        </div>
+        <div class="form-group">
+          {{ form.last_name.label }}
+          {{ form.last_name(class="form-control") }}
         </div>
         <div class="form-group">
           {{ form.email.label }}
           {{ form.email(class="form-control") }}
-          <!-- {{ form.email.errors }} -->
         </div>
         <div class="form-group">
           {{ form.password.label }}
           {{ form.password(class="form-control") }}
-          <!-- {{ form.password.errors }} -->
         </div>
         <div class="form-group">
           {{ form.confirm_password.label }}
           {{ form.confirm_password(class="form-control") }}
-          <!-- {{ form.confirm_password.errors }} -->
         </div>
         
-        {% if user-role == "member" %}
+        {% if user_role == "member" %}
           <div class="form-group"> 
             {{ form.goal_weight.label }}
+            print("Member is the user role")
             {{ form.goal_weight(class="form-control") }}
-            <!-- {{ form.goal_weight.errors }} -->
           </div>
           <div class=""form-group>
             {{ form.goal_date.label }}
             {{ form.goal_date(class="form-control") }}
-            <!-- {{ form.goal_date.errors }} -->
           </div>
           <div class="form-group">
             {{ form.height.label }}
             {{ form.height(class="form-control") }}
-            <!-- {{ form.height.errors }} -->
           </div>
         {% endif %}
-        <button type="submit" class="btn btn-primary">Submit</button>
+        <div class="form-group">
+          {{ form.submit(class="btn btn-primary") }}
+        </div>
       </form>
-
+    {% endif %}
 {% endblock %}
