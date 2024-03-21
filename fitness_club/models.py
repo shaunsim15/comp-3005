@@ -21,6 +21,10 @@ class Member(db.Model, UserMixin):
     def get_id(self):
         return str(self.member_id)
 
+    @property
+    def role(self):
+        return "Member"
+
 class Trainer(db.Model, UserMixin):
     __tablename__ = 'trainer'
 
@@ -36,6 +40,10 @@ class Trainer(db.Model, UserMixin):
     def get_id(self):
         return str(self.trainer_id)
 
+    @property
+    def role(self):
+        return "Trainer"
+
 
 class Admin(db.Model, UserMixin):
     __tablename__ = 'admin'
@@ -48,6 +56,10 @@ class Admin(db.Model, UserMixin):
 
     def get_id(self):
         return str(self.admin_id)
+
+    @property
+    def role(self):
+        return "Admin"
 
 
 class Session(db.Model):
@@ -73,13 +85,3 @@ class Room(db.Model):
     room_id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(20))
     capacity = db.Column(db.Integer)
-
-
-# class Trainer(db.Model):
-#     __tablename__ = 'trainer'
-
-#     trainer_id = db.Column(db.Integer, primary_key=True)
-#     first_name = db.Column(db.String(20))
-#     last_name = db.Column(db.String(20))
-#     email = db.Column(db.String(50))
-#     password = db.Column(db.String(255))

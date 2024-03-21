@@ -59,12 +59,13 @@ def login():
             if user:
                 print("Inside user", user.password, form.password.data)
                 break
-            
+
         if user is None or not bcrypt.check_password_hash(user.password, form.password.data):
             flash("Login unsuccessful. Please check email and password", "danger")
             return redirect(url_for("auth.login"))
 
         login_user(user, remember=form.remember.data)
+        print("User", user, user_role, user.email)
         return redirect(url_for("dashboard.index"))
     return render_template("auth/login.html", form=form)
 
