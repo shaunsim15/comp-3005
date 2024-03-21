@@ -90,3 +90,4 @@ class Room(db.Model):
     room_id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(20))
     capacity = db.Column(db.Integer)
+    

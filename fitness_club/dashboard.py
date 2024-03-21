@@ -10,3 +10,4 @@ dashboard = Blueprint("dashboard", __name__)
 def index():
     """ This route renders the dashboard page. """
     return render_template("dashboard.html", logged_user=current_user)
+    

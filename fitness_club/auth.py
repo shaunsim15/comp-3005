@@ -75,3 +75,4 @@ def logout():
     """ This function logs out a user. """
     logout_user()
     return redirect(url_for("auth.login"))
+    
