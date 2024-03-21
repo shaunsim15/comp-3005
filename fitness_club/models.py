@@ -4,6 +4,7 @@ from sqlalchemy.orm import relationship
 from flask_login import UserMixin
 
 class Member(db.Model, UserMixin):
+    """ This class represents the member model. """
     __tablename__ = 'member'
 
     member_id = db.Column(db.Integer, primary_key=True)
@@ -25,7 +26,9 @@ class Member(db.Model, UserMixin):
     def role(self):
         return "Member"
 
+
 class Trainer(db.Model, UserMixin):
+    """ This class represents the trainer model. """
     __tablename__ = 'trainer'
 
     trainer_id = db.Column(db.Integer, primary_key=True)
@@ -46,6 +49,7 @@ class Trainer(db.Model, UserMixin):
 
 
 class Admin(db.Model, UserMixin):
+    """ This class represents the admin model. """
     __tablename__ = 'admin'
 
     admin_id = db.Column(db.Integer, primary_key=True)
@@ -78,6 +82,7 @@ class Session(db.Model):
     # relationship to Room & Trainer model
     room = db.relationship('Room', backref=db.backref('sessions', lazy=True))
     trainer = db.relationship('Trainer', backref=db.backref('sessions', lazy=True))
+
 
 class Room(db.Model):
     __tablename__ = 'room'

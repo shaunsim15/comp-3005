@@ -8,5 +8,5 @@ dashboard = Blueprint("dashboard", __name__)
 @dashboard.route("/index")
 @login_required
 def index():
-    print("Current User: ", current_user)
+    """ This route renders the dashboard page. """
     return render_template("dashboard.html", logged_user=current_user)

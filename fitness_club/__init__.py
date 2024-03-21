@@ -7,8 +7,8 @@ from flask_login import current_user, LoginManager
 from sqlalchemy import text 
 
 db = SQLAlchemy() # initialize our database object
-bcrypt = Bcrypt() # initialize our bcrypt object
-login_manager = LoginManager() # initialize our login manager object
+bcrypt = Bcrypt() 
+login_manager = LoginManager()
 login_manager.login_view = 'auth.login'
 
 # Create and configure an instance of the Flask application.
