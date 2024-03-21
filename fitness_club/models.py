@@ -2,6 +2,27 @@
 from . import db
 from sqlalchemy.orm import relationship
 
+class Member(db.Model):
+    __tablename__ = 'member'
+
+    member_id = db.Column(db.Integer, primary_key=True)
+    first_name = db.Column(db.String(20))
+    last_name = db.Column(db.String(20))
+    email = db.Column(db.String(50), unique=True, nullable=False)
+    password = db.Column(db.String(60), nullable=False)
+    goal_weight = db.Column(db.Numeric(5, 2))
+    goal_date= db.Column(db.Date)
+    height = db.Column(db.Numeric(5, 2))
+
+class Trainer(db.Model):
+    __tablename__ = 'trainer'
+
+    trainer_id = db.Column(db.Integer, primary_key=True)
+    first_name = db.Column(db.String(20))
+    last_name = db.Column(db.String(20))
+    email = db.Column(db.String(50), unique=True, nullable=False)
+    password = db.Column(db.String(60), nullable=False)
+
 class Session(db.Model):
     __tablename__ = 'session'
 

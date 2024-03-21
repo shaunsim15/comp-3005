@@ -33,9 +33,9 @@ def create_app():
 
     # import variables from files
     from .session import session
+    from .auth import users
 
     # register the blueprints defined in various files. Usually urlprefix='/': if url_prefix='/auth/' and route was "hello", we must visit /auth/hello
     app.register_blueprint(session, url_prefix='/')
-
-
+    app.register_blueprint(users, url_prefix='/')
     return app
