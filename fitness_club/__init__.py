@@ -2,11 +2,14 @@ import os
 
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
-from sqlalchemy import text # https://stackoverflow.com/questions/2268050/execute-sql-from-file-in-sqlalchemy
-
-import psycopg2
+from flask_bcrypt import Bcrypt
+from flask_login import current_user, LoginManager
+from sqlalchemy import text 
 
 db = SQLAlchemy() # initialize our database object
+bcrypt = Bcrypt() 
+login_manager = LoginManager()
+login_manager.login_view = 'auth.login'
 
 # Create and configure an instance of the Flask application.
 def create_app():
@@ -21,7 +24,9 @@ def create_app():
 
     # The location of our postgres database
     app.config["SQLALCHEMY_DATABASE_URI"] = f"postgresql://{username}:{password}@localhost:5432/{dbname}" 
-    db.init_app(app) # Attach an instance of the SQLAlchemy class to our Flask app
+    db.init_app(app)
+    bcrypt.init_app(app)
+    login_manager.init_app(app) 
 
     # creates an app context, within which the Flask app and its configuratoins are available for use. Useful when working with Flask components outside fo regular request/response cycle.
     with app.app_context():
@@ -33,9 +38,13 @@ def create_app():
 
     # import variables from files
     from .session import session
+    from .dashboard import dashboard
+    from .auth import users
+    from .models import Member, Trainer, Admin
+
 
     # register the blueprints defined in various files. Usually urlprefix='/': if url_prefix='/auth/' and route was "hello", we must visit /auth/hello
     app.register_blueprint(session, url_prefix='/')
-
-
+    app.register_blueprint(users, url_prefix='/')
+    app.register_blueprint(dashboard, url_prefix='/')
     return app

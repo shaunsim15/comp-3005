@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% block title %}Dashboard{% endblock %}
+{% block content %}
+
+<h1 align="center">Dashboard</h1>
+    <p> Welcome to the Fitness Club Dashboard</p>
+    <p> You are logged in as: {{ logged_user.email }}</p>
+    <p> Your user role is: {{ logged_user.role }}</p>
+    <p> Your first name is: {{ logged_user.first_name }}</p>
+    <p> Your last name is: {{ logged_user.last_name }}</p>
+    <p> Your goal weight is: {{ logged_user.goal_weight }}</p>
+    <p> Your goal date is: {{ logged_user.goal_date }}</p>
+    <p> Your height is: {{ logged_user.height }}</p>
+
+{% endblock %}

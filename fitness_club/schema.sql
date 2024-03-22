@@ -15,7 +15,7 @@ DROP TABLE IF EXISTS member;
 
 
 CREATE TABLE member (
-    member_id SERIAL PRIMARY KEY,
+    member_id SERIAL PRIMARY KEY,   
     first_name VARCHAR(20),
     last_name VARCHAR(20),
     email VARCHAR(50),
