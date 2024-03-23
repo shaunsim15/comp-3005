@@ -90,4 +90,16 @@ class Room(db.Model):
     room_id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(20))
     capacity = db.Column(db.Integer)
+
+
+class WeightLog(db.Model):
+    __tablename__ = 'weight_log'
+    date = db.Column(db.Date, primary_key = True)
+    weight = db.Column(db.Integer)
+    member_id = db.Column(db.Integer, primary_key=True)
+    
+    def __repr__(self):
+        return f"<WeightLog date={self.date} member_id={self.member_id}>"
+
+
     
