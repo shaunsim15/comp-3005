@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{% block title %}Health Metrics{% endblock %}
+{% block content %}
+
+<h1 align="center">Health Metrics</h1>
+<form method="POST">
+  {{ log_weight_form.hidden_tag() }}
+  <div class="form-group">
+    {{ log_weight_form.weight.label }}
+    {{ log_weight_form.weight(class="form-control") }}
+  </div>
+  <div class="form-group">
+    {{ log_weight_form.date.label }}
+    {{ log_weight_form.date(class="form-control") }}
+  </div>
+  <div class="form-group">
+    <button type="submit" class="btn btn-primary">Submit</button>
+  </div>
+</form>
+
+{% endblock %}
