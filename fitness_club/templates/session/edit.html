@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+{% block title %} {{ "Edit" ~ session['name'] }} {% endblock %}
+{% block content %}
+    <h3 class="display-4 py-3 mx-auto"> Edit Session {{session.session_id}}</h3>
+    <form method="POST">
+        {{ form.hidden_tag() }}
+        <div class="form-group">
+            {{ form.name.label }}
+            {{ form.name(class="form-control", value=session.name) }}
+        </div>
+        <div class="form-group">
+            {{ form.start_time.label }}
+            {{ form.start_time(class="form-control", value=session.start_time) }}
+        </div>
+        <div class="form-group">
+            {{ form.end_time.label }}
+            {{ form.end_time(class="form-control", value=session.end_time) }}
+        </div>
+        <div class="form-group">
+            {{ form.is_group_booking.label }}
+            <select class="form-control" style="caret-color: transparent;" disabled readonly>
+                {% if session.is_group_booking %}
+                    <option selected> Yes </option>
+                {% else %}
+                    <option selected> No </option>
+                {% endif %}
+            </select> 
+        </div>
+        <div class="form-group">
+            {{ form.pricing.label }}
+            <input type="number" class="form-control" value="{{ session.pricing }}" style="caret-color: transparent;" disabled readonly>
+        </div>
+        <div class="form-group">
+            {{ form.room_id.label }}
+            <select class="form-control" style="caret-color: transparent;" disabled readonly>
+                <option selected>{{ session.room_id }}</option>
+            </select> 
+        </div>
+        <div class="form-group">
+            {{ form.trainer_id.label }}
+            <select class="form-control" id="trainer_id" name="trainer_id">
+                {% for value, label in form.trainer_id.choices %}
+                    {% set selected = session.trainer_id == value %}
+                    <option value="{{ value }}" {% if selected %}selected{% endif %}>{{ label }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="form-group">
+            <input class="btn btn-primary" id="submit" name="submit" type="submit" value="Update">
+        </div>
+    </form>
+{% endblock %}

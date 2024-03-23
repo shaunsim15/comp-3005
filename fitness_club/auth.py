@@ -7,7 +7,7 @@ from flask import Blueprint, render_template, redirect, url_for, request, flash
 
 users = Blueprint("auth", __name__, url_prefix="/auth")
 
-@login_manager.user_loader
+@login_manager.user_loader # This decorator registers load_user as the callback function to be used by Flask Login for loading a user object from the session https://flask-login.readthedocs.io/en/latest/#how-it-works
 def load_user(user_id):
     """ This function is used to reload the user object from the user ID stored in the session. """
     for Model in [Member, Trainer, Admin]:

@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+{% block title %}Create new Session{% endblock %}
+{% block content %}
+
+
+
+    <h3 class="display-4 py-3 mx-auto">Create new Session</h3>
+    <form method="POST">
+        {{ form.hidden_tag() }}
+        <div class="form-group">
+            {{ form.name.label }}
+            {{ form.name(class="form-control") }}
+        </div>
+        <div class="form-group">
+            {{ form.start_time.label }}
+            {{ form.start_time(class="form-control") }}
+        </div>
+        <div class="form-group">
+            {{ form.end_time.label }}
+            {{ form.end_time(class="form-control") }}
+        </div>
+        <div class="form-group">
+            {{ form.is_group_booking.label }}
+            {{ form.is_group_booking(class="form-control", disabled=disabled, style="caret-color: transparent;") }}
+        </div>
+        <div class="form-group">
+            {{ form.pricing.label }}
+            {{ form.pricing(class="form-control", disabled=disabled, style="caret-color: transparent;") }}
+        </div>
+        <div class="form-group">
+            {{ form.room_id.label }}
+            <select class="form-control" style="caret-color: transparent;" disabled readonly>
+                <option selected> None </option>
+            </select> 
+        </div>
+        <div class="form-group">
+            {{ form.trainer_id.label }}
+            {{ form.trainer_id(class="form-control") }}
+        </div>
+        <div class="form-group">
+            <input class="btn btn-primary" id="submit" name="submit" type="submit" value="Create">
+        </div>
+    </form>
+{% endblock %}

@@ -38,7 +38,7 @@ def create_app():
         db.session.execute(text(sql_commands))
         db.session.commit()
 
-    # import variables from files
+    # import Blueprint class instances from files
     from .session import session
     from .dashboard import dashboard
     from .auth import users
@@ -46,7 +46,7 @@ def create_app():
 
 
     # register the blueprints defined in various files. Usually urlprefix='/': if url_prefix='/auth/' and route was "hello", we must visit /auth/hello
-    app.register_blueprint(session, url_prefix='/')
+    app.register_blueprint(session, url_prefix='/session')
     app.register_blueprint(users, url_prefix='/')
     app.register_blueprint(dashboard, url_prefix='/')
     return app
