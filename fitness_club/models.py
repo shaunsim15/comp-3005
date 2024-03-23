@@ -3,11 +3,11 @@ from . import db
 from sqlalchemy.orm import relationship
 from flask_login import UserMixin
 
-class Member(db.Model, UserMixin):
-    """ This class represents the member model. """
-    __tablename__ = 'member'
+class Member(db.Model, UserMixin): # Member inherits from 2 classes. db.Model is a SQL Alchemy class. SQL Alchemy is used for ORM; an instance of the Member class corresponds to a record in the db.
+    """ This class represents the member model. """ # UserMixin is a class provided by Flask-Login (extension for managing user authentication). Inheriting from Flask-Login gives the Member class user-related functionality.
+    __tablename__ = 'member' # This line sets the name of the database table associated with this model to 'member'
 
-    member_id = db.Column(db.Integer, primary_key=True)
+    member_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     first_name = db.Column(db.String(20))
     last_name = db.Column(db.String(20))
     email = db.Column(db.String(50), unique=True, nullable=False)
@@ -16,13 +16,13 @@ class Member(db.Model, UserMixin):
     goal_date= db.Column(db.Date)
     height = db.Column(db.Numeric(5, 2))
 
-    def __repr__(self):
+    def __repr__(self): # Provides a stringificaiton of the member object, kinda like toString() in Java
         return f"Member('{self.first_name}', '{self.last_name}', '{self.email}')"
 
-    def get_id(self):
+    def get_id(self): # Gets the member_id in string form, just a method for instances of this class. Needed for the Flask-Login extension to work
         return str(self.member_id)
 
-    @property
+    @property # This decorator allows defining a method that can be accessed like an attribute. Role is a property of the Member class
     def role(self):
         return "Member"
 
@@ -31,7 +31,7 @@ class Trainer(db.Model, UserMixin):
     """ This class represents the trainer model. """
     __tablename__ = 'trainer'
 
-    trainer_id = db.Column(db.Integer, primary_key=True)
+    trainer_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     first_name = db.Column(db.String(20))
     last_name = db.Column(db.String(20))
     email = db.Column(db.String(50), unique=True, nullable=False)
@@ -52,7 +52,7 @@ class Admin(db.Model, UserMixin):
     """ This class represents the admin model. """
     __tablename__ = 'admin'
 
-    admin_id = db.Column(db.Integer, primary_key=True)
+    admin_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     first_name = db.Column(db.String(20))
     last_name = db.Column(db.String(20))
     email = db.Column(db.String(50), unique=True, nullable=False)
