@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{% block title %}My New Goals{% endblock %}
+{% block content %}
+
+<h1 align="center">Goal Setting</h1>
+<form method="POST">
+  {{ goal_form.hidden_tag() }}
+  <div class="form-group">
+    {{ goal_form.goal_weight.label }}
+    {{ goal_form.goal_weight(class="form-control") }}
+  </div>
+  <div class="form-group">
+    {{ goal_form.goal_date.label }}
+    {{ goal_form.goal_date(class="form-control") }}
+  </div>
+  <div class="form-group">
+    <button type="submit" class="btn btn-primary">Submit</button>
+  </div>
+</form>
+
+{% endblock %}
