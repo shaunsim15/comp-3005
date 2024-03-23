@@ -18,8 +18,8 @@ CREATE TABLE member (
     member_id SERIAL PRIMARY KEY,   
     first_name VARCHAR(20),
     last_name VARCHAR(20),
-    email VARCHAR(50),
-    password VARCHAR(255),
+    email VARCHAR(50) UNIQUE NOT NULL,
+    password VARCHAR(255) NOT NULL,
     goal_weight NUMERIC(5,2),
     goal_date DATE,
     height NUMERIC(5,2)
@@ -60,8 +60,8 @@ CREATE TABLE trainer(
     trainer_id SERIAL PRIMARY KEY,
     first_name VARCHAR(20),
     last_name VARCHAR(20),
-    email VARCHAR(50),
-    password VARCHAR(255)
+    email VARCHAR(50) UNIQUE NOT NULL,
+    password VARCHAR(255) NOT NULL
 );
 
 CREATE TABLE session(
@@ -131,24 +131,24 @@ CREATE TABLE equipment(
 
 CREATE TABLE admin(
     admin_id SERIAL PRIMARY KEY,
-    email VARCHAR(50),
-    password VARCHAR(255),
+    email VARCHAR(50) UNIQUE NOT NULL,
+    password VARCHAR(255) NOT NULL,
     first_name VARCHAR(20),
     last_name VARCHAR(20)
 );
 
 INSERT INTO member (first_name, last_name, email, password, goal_weight, goal_date, height)
 VALUES
-('John', 'Doe', 'johndoe@gmail.com', 'password123', 70.5, '2024-06-01', 175),
-('Jane', 'Smith', 'janesmith@gmail.com', 'letmein', 65.2, '2024-07-15', 162),
-('Michael', 'Johnson', 'michaelj@gmail.com', 'abc123', 80.0, '2024-09-30', 180),
-('Emily', 'Brown', 'emilybrown@gmail.com', 'ilovefitness', 60.0, '2024-08-20', 160),
-('Daniel', 'Williams', 'danielw@gmail.com', 'workout123', 75.8, '2024-10-10', 178),
-('Jessica', 'Davis', 'jessicad@gmail.com', 'fitnessgirl', 55.0, '2024-07-01', 155),
-('Sarah', 'Wilson', 'sarahwilson@gmail.com', 'strongwoman', 62.5, '2024-08-10', 165),
-('Matthew', 'Taylor', 'matthewtaylor@gmail.com', 'fitnessfreak', 72.3, '2024-09-20', 180),
-('Emma', 'Anderson', 'emmaa@gmail.com', 'healthy123', 55.8, '2024-07-05', 158),
-('Christopher', 'Martinez', 'chrism@gmail.com', 'fitlife', 68.0, '2024-10-15', 175);
+('John', 'Doe', 'johndoe@gmail.com', '$2b$12$HKOaYFobfQYbRyaMvLVcweG38Y1s3X/Rcr3bIZbvuyDLSSAIuWmAS', 70.5, '2024-06-01', 175), -- 'password123'
+('Jane', 'Smith', 'janesmith@gmail.com', '$2b$12$fj/qNzLftQ.2GvgwT8PQBuK9JJ04og6IaZRYt2zGiLZf/mutL46wq', 65.2, '2024-07-15', 162), -- 'letmein'
+('Michael', 'Johnson', 'michaelj@gmail.com', '$2b$12$HPmUjWnoKCooC.xs6e8IsuEM7bKANdmOUbCG6HN.ACK/cD0.hMlEu', 80.0, '2024-09-30', 180), -- 'abc123'
+('Emily', 'Brown', 'emilybrown@gmail.com', '$2b$12$8vnF4xKBLQ75dUZDXRFhBei5q7eV6KKBCFxbeOUNKFAwK8iP8/5Hu', 60.0, '2024-08-20', 160), -- 'ilovefitness'
+('Daniel', 'Williams', 'danielw@gmail.com', '$2b$12$ap9Cvz8szIaEuQBRjaBg/.m/i.OG2JgdyFwSTD3tbRr6hB7iNycnu', 75.8, '2024-10-10', 178), -- 'workout123'
+('Jessica', 'Davis', 'jessicad@gmail.com', '$2b$12$aNXozG7V0w2n3mVk34m3v.PmmeO6bGiDRXOkOHrdCwuAOGKCP1uoS', 55.0, '2024-07-01', 155), -- 'fitnessgirl'
+('Sarah', 'Wilson', 'sarahwilson@gmail.com', '$2b$12$fayHn0DDNFLjhRHyKmtG6.cQTj3boImZYk3WhstqvPTipHaj1AyWm', 62.5, '2024-08-10', 165), -- 'strongwoman'
+('Matthew', 'Taylor', 'matthewtaylor@gmail.com', '$2b$12$LfJ68MJsQLBAmnJ0VMcsK.c7ydLHeG5fcD4KXBu0i5EWlVkcqQ8Nq', 72.3, '2024-09-20', 180), -- 'fitnessfreak'
+('Emma', 'Anderson', 'emmaa@gmail.com', '$2b$12$FB2MsFr0Ob1kT0rbcjj8AeSE4ZofpJrvRrG/ndfhskLIIJKCN3Yz.', 55.8, '2024-07-05', 158), -- 'healthy123'
+('Christopher', 'Martinez', 'chrism@gmail.com', '$2b$12$e4KyZBMIMvV7IIvLQ.PG3.4gf7RT40tbqErykI4NNZmBqqtrMGZoC', 68.0, '2024-10-15', 175); -- 'fitlife'
 
 
 INSERT INTO weight_log (weight, date, member_id)

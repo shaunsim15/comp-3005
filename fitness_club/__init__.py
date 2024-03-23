@@ -24,11 +24,13 @@ def create_app():
 
     # The location of our postgres database
     app.config["SQLALCHEMY_DATABASE_URI"] = f"postgresql://{username}:{password}@localhost:5432/{dbname}" 
+    
+    # Attach instances of the SQLAlchemy, BCrypt and LoginManager classes to our Flask app
     db.init_app(app)
     bcrypt.init_app(app)
     login_manager.init_app(app) 
 
-    # creates an app context, within which the Flask app and its configuratoins are available for use. Useful when working with Flask components outside fo regular request/response cycle.
+    # creates an app context, within which the Flask app and its configurations are available for use. Useful when working with Flask components outside of regular request/response cycle.
     with app.app_context():
         # db.create_all() will create db tables based on models, but we dont want this
         with open("fitness_club/schema.sql", 'r') as f:
