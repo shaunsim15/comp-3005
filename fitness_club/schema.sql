@@ -71,7 +71,6 @@ CREATE TABLE session(
     end_time TIMESTAMP,
     is_group_booking BOOLEAN,
     pricing NUMERIC(8,2) CHECK (pricing > 0),
-    is_room_confirmed BOOLEAN,
     room_id INT,
     trainer_id INT,
     FOREIGN KEY (room_id) REFERENCES room
@@ -207,13 +206,13 @@ VALUES
 ('Samantha', 'Evans', 'samanthae@gmail.com', 'gymlover'),
 ('Ryan','Garcia', 'ryang@gmail.com', 'fitnessexpert');
 
-INSERT INTO session (name, start_time, end_time, is_group_booking, pricing, is_room_confirmed, room_id, trainer_id)
+INSERT INTO session (name, start_time, end_time, is_group_booking, pricing, room_id, trainer_id)
 VALUES
-('Session 1', '2024-03-16 08:00:00', '2024-03-16 09:00:00', true, 15.00, true, 3, 1),
-('Session 2', '2024-03-16 17:00:00', '2024-03-16 18:00:00', true, 20.00, true, 2, 2),
-('Session 3', '2024-03-16 18:30:00', '2024-03-16 19:30:00', true, 15.00, true, 1, 3),
-('Session 4', '2024-03-16 10:00:00', '2024-03-16 11:00:00', true, 18.00, true, 3, 4),
-('Session 5', '2024-03-16 18:00:00', '2024-03-16 19:00:00', true, 15.00, true, 3, 5);
+('Session 1', '2024-03-16 08:00:00', '2024-03-16 09:00:00', true, 15.00, 3, 1),
+('Session 2', '2024-03-16 17:00:00', '2024-03-16 18:00:00', true, 20.00, 2, 2),
+('Session 3', '2024-03-16 18:30:00', '2024-03-16 19:30:00', true, 15.00, 1, 3),
+('Session 4', '2024-03-16 10:00:00', '2024-03-16 11:00:00', true, 18.00, 3, 4),
+('Session 5', '2024-03-16 18:00:00', '2024-03-16 19:00:00', true, 15.00, 3, 5);
 
 
 INSERT INTO member_session (member_id, session_id, has_paid_for)

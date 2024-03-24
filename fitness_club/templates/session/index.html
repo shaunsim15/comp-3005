@@ -1,9 +1,29 @@
-<h1>Sessions here!</h1>
+{% extends "base.html" %}
+{% block title %}Sessions{% endblock %}
+{% block content %}
 
-<ul class="list-group list-group-flush" id="notes">
-    {% for room in rooms %}
-        <li class="list-group-item">
-        {{ room.name }}
-        </li>
-    {% endfor %}
-</ul>
+<h3 class="display-4 py-3 mx-auto">Sessions</h3>
+
+<table class="table table-bordered">
+    <thead class="thead-dark">
+        <tr>
+            <th>ID</th>
+            <th>Name</th>
+            <th>Start Time</th>
+            <th>End Time</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for session in sessions %}
+        <tr>
+            <td>{{ session.session_id }}</td>
+            <td><a href="{{ session.session_id }}">{{ session.name }}</a></td>
+            <td>{{ session.start_time }}</td>
+            <td>{{ session.end_time }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+<a class="btn btn-primary" href="new" role="button">Create new Session</a>
+
+{% endblock %}

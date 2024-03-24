@@ -75,7 +75,6 @@ class Session(db.Model):
     end_time = db.Column(db.TIMESTAMP)
     is_group_booking = db.Column(db.Boolean)
     pricing = db.Column(db.Numeric(8, 2), nullable=False) # maybe some constraint is needed here to reflect schema?
-    is_room_confirmed = db.Column(db.Boolean)
     room_id = db.Column(db.Integer, db.ForeignKey('room.room_id', ondelete='SET NULL'))
     trainer_id = db.Column(db.Integer, db.ForeignKey('trainer.trainer_id', ondelete='SET NULL'))
 

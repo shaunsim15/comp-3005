@@ -1,0 +1,48 @@
+{% extends 'base.html' %}
+{% block title %} {{ session['name'] }} {% endblock %}
+
+{% block content %}
+<h3 class="display-4 py-3 mx-auto">Session {{session.session_id}}</h3>
+    <div class="form-group">
+        {{ form.name.label }}
+        <input type="text" class="form-control" value="{{ session.name }}" style="caret-color: transparent;" disabled readonly>
+    </div>
+    <div class="form-group">
+        {{ form.start_time.label }}
+        <input type="datetime-local" class="form-control" value="{{ session.start_time }}" style="caret-color: transparent;" disabled readonly>
+    </div>
+    <div class="form-group">
+        {{ form.end_time.label }}
+        <input type="datetime-local" class="form-control" value="{{ session.end_time }}" style="caret-color: transparent;" disabled readonly>
+    </div>
+    <div class="form-group">
+        {{ form.is_group_booking.label }}
+        <select class="form-control" style="caret-color: transparent;" disabled readonly>
+            {% if session.is_group_booking %}
+                <option selected> Yes </option>
+            {% else %}
+                <option selected> No </option>
+            {% endif %}
+        </select> 
+    </div>
+    <div class="form-group">
+        {{ form.pricing.label }}
+        <input type="number" class="form-control" value="{{ session.pricing }}" style="caret-color: transparent;" disabled readonly>
+    </div>
+    <div class="form-group">
+        {{ form.room_id.label }}
+        <select class="form-control" style="caret-color: transparent;" disabled readonly>
+            <option selected>{{ session.room_id }}</option>
+        </select> 
+    </div>
+    <div class="form-group">
+        {{ form.trainer_id.label }}
+        <select class="form-control" style="caret-color: transparent;" disabled readonly>
+            <option selected>{{ trainer_name }}</option>
+        </select> 
+    </div>
+    <a class="btn btn-primary py-3" href="{{ session.session_id ~ '/edit' }}" role="button">Edit Session</a>
+    <form class="py-3" method="POST" action="{{session.session_id ~ '/delete'}}">
+        <button type="submit py-3" class="btn btn-danger">Delete</button>
+    </form>
+{% endblock %}
