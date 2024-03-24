@@ -88,7 +88,7 @@ CREATE TABLE member_session(
     has_paid_for BOOLEAN,
     PRIMARY KEY (member_id, session_id),
     FOREIGN KEY (member_id) REFERENCES member
-        ON DELETE SET NULL,
+        ON DELETE CASCADE,
     FOREIGN KEY (session_id) REFERENCES session
         ON DELETE CASCADE
 );
@@ -169,9 +169,9 @@ VALUES
 
 INSERT INTO achievement (name)
 VALUES
-('1st Session Done'),
-('10 Sessions Done'),
-('25 Sessions Done');
+('1st Session Booked'),
+('10 Sessions Booked'),
+('25 Sessions Booked');
 
 INSERT INTO member_achievement (member_id, achievement_id, date)
 VALUES
