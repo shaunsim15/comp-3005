@@ -56,6 +56,7 @@ CREATE TABLE room(
     capacity INT
 );
 
+
 CREATE TABLE trainer(
     trainer_id SERIAL PRIMARY KEY,
     first_name VARCHAR(20),
@@ -197,14 +198,15 @@ VALUES
 
 INSERT INTO trainer (first_name, last_name, email, password)
 VALUES
-('Emily', 'Davis', 'emilyd@gmail.com', 'trainerpass'),
-('David', 'Wilson', 'davidw@gmail.com', 'fitness123'),
-('Rachel', 'Miller', 'rachelm@gmail.com', 'trainer123'),
-('Kevin', 'Clark', 'kevinc@gmail.com', 'fitnessking'),
-('Jessica', 'Brown', 'jessicab@gmail.com', 'trainer456'),
-('Michael', 'Taylor', 'michaelt@gmail.com', 'fitness789'),
-('Samantha', 'Evans', 'samanthae@gmail.com', 'gymlover'),
-('Ryan','Garcia', 'ryang@gmail.com', 'fitnessexpert');
+('Emily', 'Davis', 'emilyd@gmail.com', '$2b$12$orV99QxNV5sLXJbHVDfxyeCXjvoz8VH047AhEqYNTnHLjIDlySG2O'), -- pass: trainerpass
+('David', 'Wilson', 'davidw@gmail.com', '$2b$12$tL3ccEDulB117rDrxBjA1OTSXMsxlGBiC/pmBq.BA1DSiaKdmy6gu'), -- pass: fitness123
+('Rachel', 'Miller', 'rachelm@gmail.com', '$2b$12$s6vgQdc8am8wdXzCv2LQp.93TidIsI.h/vIXdQK/aQ5ZuS/sqriXy'), -- pass: trainer123
+('Kevin', 'Clark', 'kevinc@gmail.com', '$2b$12$n27PMi9llts5Uo2MLPERFuVH2/NQpjK6X/DPoain/T5Q7fTRZTPLi'), -- pass: fitnessking
+('Jessica', 'Brown', 'jessicab@gmail.com', '$2b$12$dVRJweWoq/NolRxeMZDIiOJkOwUcoodsovdw6NlV8TQJvigwgZoe.'), -- pass: trainer456
+('Michael', 'Taylor', 'michaelt@gmail.com', '$2b$12$J0WpbvMaefcJRmGMUCVvx.JX/VQJ66ICfOHOtrVAQPC73b3Ii4Ppy'), -- pass: trainer789
+('Samantha', 'Evans', 'samanthae@gmail.com', '$2b$12$U1fHJRlQRCLDDtTFUpHe7ePquBczlgJLJ23Zi5eFxRg2CXWrqecZe'), -- pass: gymlover
+('Ryan','Garcia', 'ryang@gmail.com', '$2b$12$q35D3KA1Ig4D3uLoX17nYulOcNMu20uBrxr2jDl/DFiwonwM1KGWe'); -- pass: fitnessexpert
+
 
 INSERT INTO session (name, start_time, end_time, is_group_booking, pricing, room_id, trainer_id)
 VALUES
@@ -320,7 +322,7 @@ VALUES
 
 INSERT INTO admin (email, password, first_name, last_name)
 VALUES
-('evan@gmail.com', 'adminpass1', 'Evan', 'Lastnameone'),
-('sean@gmail.com', 'adminpass2', 'Sean', 'Lastnametwo'),
-('david@gmail.com', 'adminpass3', 'David', 'Lastnamethree'),
-('precious@gmail.com', 'adminpass4', 'Precious', 'Four');
+('evan@gmail.com', '$2b$12$LfbIwn6pcv0LTiRfeP4Pm.Bq7XO2K1seQGo08s1o7S3Co1pK6czHi', 'Evan', 'Lastnameone'), -- pass: adminpass1
+('sean@gmail.com', '$2b$12$PQu093G4ZQ95pmQg4n7VL.Vh8dJ9Nq.YI2GNA2f/fjlpzSvRloju.', 'Sean', 'Lastnametwo'), -- pass: adminpass2
+('david@gmail.com', '$2b$12$vmBtHElfhSTDYz4PLOOZbufbJrcBUU7di6onn7mZ2aA4m7E40E5L.', 'David', 'Lastnamethree'), -- pass: adminpass3
+('precious@gmail.com', '$2b$12$r7hB0hhILq5FjLFxLO99iuyu0NEjZoCEyLH3XqL1oucyCESBBF8CK', 'Precious', 'Four'); -- pass: adminpass4
