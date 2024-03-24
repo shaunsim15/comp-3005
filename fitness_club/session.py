@@ -131,22 +131,25 @@ def delete_session(session_id):
 
 ###################################################################
 ### List of Logic Checks (LC) TBD for Index: ###
-# LC: If Member, only display: All Group Sessions and All Personal Sessions that have a MemberSession associated with the Member.
-# LC: If Trainer/Admin, display: All Sessions
+# To-Dos (MISC)
+# LC: If logged in as member, only display: 1) All Personal Sessions that have a MemberSession associated with the Member. 2) All Group Sessions 
+# LC: If logged in as Trainer/Admin, display: All Sessions
 
 ###################################################################
 ### List of Logic Checks (LC) TBD for Show: ###
 # To-Dos (ANYBODY)
 # LC: If ANYBODY, shud be able to SEE Routines (and their routine_count)
 # LC: If ANYBODY, shud be able to SEE Room Capacity for a Session
+
+# To-Dos (MISC):
 # LC: If trainer/admin personal or trainer/admin group, shud be able to SEE Member Count, SEE individual Members (and ALL their has_paid_for) for a Group/Personal Session
-# LC: If member, shud be able to SEE ONLY THEIR OWN has_paid_for for a Group/Personal Session
+# LC: If member personal or member group, shud be able to SEE ONLY THEIR OWN has_paid_for for a Group/Personal Session
 
 ###################################################################
 ### List of FUnctionalities (FU), Logic Checks (LC) AND Database Updates (DU) TBD for New: ###
 
 # To-Dos (ANYBODY) (can be part of reusable functions?)
-# LC: If ANYBODY, shud check end-date-time > start-date-time 
+# LC: If ANYBODY, shud check end-date-time > start-date-time by at least 1h
 # LC: If ANYBODY, shud check trainer is available in specified time
 # FU: If ANYBODY, shud be able to CHOOSE routines (and their routine_count) for a Personal/Group Session (but ofc Member Group is impossible)
 # LC: If ANYBODY (Optional) Shud check EACH Member for this Session not already enrolled in a session with the same time (no double booking of Members)
@@ -170,67 +173,80 @@ def delete_session(session_id):
 # To-Dos (Trainer/Admin Group):
 # FU: If trainer/admin group, in UI shud be able to CHOOSE memberSSS for a Group Session
 # LC: If trainer/admin group, i.e. if is_group_booking=True, no checks on the number of members. 
-# FU: If trainer/admin group, MUST PICK A room (cant be None). Why? If I don't pick a room to begin with, I have no way of knowing capacity, and no way of restricting further intake based on capacity. 
+# FU: If trainer/admin group, MUST PICK A room (cant be None). Why? Because if I don't pick a room to begin with, I have no way of knowing capacity, and no way of restricting further intake based on capacity. 
 
 # To-Dos (MISC):
 # LC: If member personal or trainer/admin personal (Optional), shud check there is at least 1 room with enough space before 'placing the booking with Null Room'. Doesnt fully solve problem because you might receive multiple bookings be reserved even if only 1 room available...
 # LC: If trainer/admin personal or trainer/admin group, and we chose Non-None Room, must validate there are no other Sessions with start-end conflicting with start-end in this Room
 # LC: If trainer/admin personal or trainer/admin group, and we chose Non-None Room, must validate this room has capacity to house as many Members as specified in the NEW form (trivial in the case of Personal, as just 1 Member). I assume room capacity is MEMBER capacity; I exclude the trainer's headcount
 # FU: If trainer/admin personal or trainer/admin group, shud be able to CHOOSE pricing (to not 20). This shouldnt be modifiable afterwards (or else we might be 'cheating' custsomers). 
-
+# FU: If trainer/admin personal or trainer/admin group, shud be able to set is_group_booking. This shouldnt be modifiable afterwards (I think there'll be data conflicts). 
 
 ###################################################################
 ### List of FUnctionalities (FU), Logic Checks (LC) AND Database Updates (DU) TBD for Edit: ###
 
 # To-Dos (ANYBODY) (can be part of reusable functions?)
-# LC: If ANYBODY, shud check end-date-time > start-date-time 
+# LC: If ANYBODY, shud check end-date-time > start-date-time by at least 1h
 # LC: If ANYBODY, shud check trainer is available in specified time
-# FU: If ANYBODY, shud be able to CHOOSE routines (and their routine_count) for a Personal/Group Session (but ofc Member Group is impossible)
-# FU: If ANYBODY, shud NOT be able to change pricing.
+# FU: If ANYBODY, shud NOT be able to change pricing (or else we might be 'cheating' custsomers). 
+# FU: If ANYBODY, shud NOT be able to change is_group_booking (I think there'll be data conflicts). 
 # LC: If ANYBODY (Optional) Shud check EACH Member for this Session not already enrolled in a session with the same time (no double booking of Members)
 # DU: If ANYBODY, shud UPDATE a Session (If changes were made)
-# DU: If ANYBODY, shud CREATE 0, 1 or multiple SessionRoutines if successful (must be done before MemberSession, else achievement/stats checking will be wrong).
-# DU: If ANYBODY, shud CREATE 0 (Group/Personal), 1 (Group/Personal) or multiple MemberSessions (Group) if successful. For each MemberSession, has_paid_for should default to False since this is NEW route
-# DU: If ANYBODY, If either of the 3 database updates above fails, DONT create ANY of them
-# DU: If ANYBODY, each successful MemberSession creation should TRIGGER Updates to the MemberAchievement table. This logic is VERY complex if we deal with multiple achievements.
+# DU: If ANYBODY, shud CREATE, UPDATE EXISTING or DELETE EXISTING SessionRoutines if successful (must be done before MemberSession, else achievement/stats checking will be wrong).
+# DU: If ANYBODY, shud CREATE or DELETE EXISTING MemberSessions if successful. For each CREATED MemberSession, has_paid_for should default to False (since new). Shouldn't be able to UPDATE EXISTING MemberSession, because we shouldnt be able to change has_paid_for. Can only DELETE MemberSession, if has_paid_for=False, else Members are losing money!!
+# DU: If ANYBODY, If either of the 3 database updates above fails, DONT create/delete ANY of them
+# DU: If ANYBODY, each successful MemberSession creation/deletion should TRIGGER Updates to the MemberAchievement table. This logic is VERY complex if we deal with multiple achievements.
 
 # To-Dos (Member Personal):
-# FU: If member personal, 
+# FU: If member personal, CANNOT EDIT sesion_id, is_group_booking, pricing, room_id
+# FU: If member personal, CAN EDIT Name, start/end time, trainer_id, routines
 
 # To-Dos (Member Group):
 # FU: If member group, CANNOT EDIT session_id, Name, start/end time, is_group_booking, pricing, room_id, trainer_id, routines.
 # FU: If member group, CAN ONLY ADD yourself as a SessionMember, or REMOVE yourself as a SessionMember (2 possible buttons).
 
-
 # To-Dos (Trainer/Admin Personal):
-# FU: If trainer/admin personal, in UI shud be able to CHOOSE ONLY ONE member for a Personal Session
+# FU: If trainer/admin personal, CANNOT EDIT sesion_id, is_group_booking, pricing
+# FU: If trainer/admin personal, EDIT Name, start/end time, trainer_id, routines, room_id, members**
+# FU: If trainer/admin personal, in UI shud be able to CHOOSE ONLY ONE member** for a Personal Session
 # LC: If trainer/admin personal, must check that number of members is <=1 if is_group_booking=False. (ASIDE: If if is_group_booking=True, we can have number of members <= 1 or > 1, so no need to check this) 
-# FU: If trainer/admin personal, shud be able to CHOOSE room (can be None or not None). 
+# FU: If trainer/admin personal, shud be able to CHOOSE room (can be None or not None).
 
 # To-Dos (Trainer/Admin Group):
-# FU: If trainer/admin group, in UI shud be able to CHOOSE memberSSS for a Group Session
+# FU: If trainer/admin group, CANNOT EDIT sesion_id, is_group_booking, pricing
+# FU: If trainer/admin group, EDIT Name, start/end time, trainer_id, routines, room_id, members**
+# FU: If trainer/admin group, in UI shud be able to CHOOSE memberSSS** for a Group Session
 # LC: If trainer/admin group, i.e. if is_group_booking=True, no checks on the number of members. 
-# FU: If trainer/admin group, MUST PICK A room (cant be None). Why? If I don't pick a room to begin with, I have no way of knowing capacity, and no way of restricting further intake based on capacity. 
+# FU: If trainer/admin group, MUST PICK A room (cant be None). Why? Because if I don't pick a room to begin with, I have no way of knowing capacity, and no way of restricting further intake based on capacity. 
 
 # To-Dos (MISC):
+# FU: If ANYBODY except Member Group, shud be able to CHOOSE routines (and their routine_count) for a Personal/Group Session
 # LC: If member personal or trainer/admin personal (Optional), shud check there is at least 1 room with enough space before 'placing the booking with Null Room'. Doesnt fully solve problem because you might receive multiple bookings be reserved even if only 1 room available...
 # LC: If trainer/admin personal or trainer/admin group, and we chose Non-None Room, must validate there are no other Sessions with start-end conflicting with start-end in this Room
-# LC: If trainer/admin personal or trainer/admin group, and we chose Non-None Room, must validate this room has capacity to house as many Members as specified in the NEW form (trivial in the case of Personal, as just 1 Member). I assume room capacity is MEMBER capacity; I exclude the trainer's headcount
-# FU: If trainer/admin personal or trainer/admin group, shud be able to CHOOSE pricing (to not 20). This shouldnt be modifiable afterwards (or else we might be 'cheating' custsomers). 
-
+# LC: If ANYBODY except Member Personal, and we chose Non-None Room, must validate this room has capacity to house as many Members as specified in the EDIT form (trivial in the case of Admin/Trainer Personal, as just 1 Member). I assume room capacity is MEMBER capacity; I exclude the trainer's headcount
+# FU: If ANYBODY, shud NOT be able to CHOOSE pricing (or else we might be 'cheating' custsomers). 
 
 ###################################################################
+### List of Logic Checks (LC) AND Database Updates (DU) TBD for Delete: ###
+# To-Dos (ANYBODY)
+# LC: If ANYBODY, shud ensure has_paid_for is False for all associated MemberSessions before attempting to delete a Session. Else, youre scamming your customers.
+# DU: If ANYBODY, shud DELETE all associated SessionRoutines if successful (ideally to be done before MemberSession, else achievement/stats checking will be wrong. But if deletion is done via SQL cascading, I may not have control over the order.).
+# DU: If ANYBODY, shud DELETE all associated MemberSessions if successful.
+# DU: If ANYBODY, shud DELETE a Session (duh).
+# DU: If ANYBODY, If either of the 3 database updates above fails, DONT commit ANY of them
+# DU: If ANYBODY, each successful MemberSession deletion should TRIGGER Updates to the MemberAchievement table. This logic is VERY complex if we deal with multiple achievements.
 
+# To-Dos (Member Personal):
+# LC: If logged in as Member, can't delete Personal Sessions that don't have a MemberSession linking you to it.  (hide this button on UI, & account for server-side)
 
-# List of Logic Checks TBD for Edit:
-# If member, shud be able to CHOOSE routines for a Session
-# Member should be able to UNREGISTER for group session without destroying it.
-# If trainer/admin, shud be able to CHOOSE Members for a Session
+# To-Dos (Member Group):
+# LC: If logged in as Member, can't delete Group Sessions! (hide this button on UI, & account for server-side)
 
-# List of Logic Checks TBD for Delete:
-# If member, can only delete All PERSONAL Sessions that have a MemberSession associated with the Member. Can't delete group sessions
-# If member, deletion of Personal Session should delete the MemberSession and SessionRoutines
+# To-Dos (Trainer/Admin Personal):
+# LC: If logged in as Trainer/Admin, can delete any Personal Session (for simplicity, allow Trainers to delete Sessions of other trainers)
 
+# To-Dos (Trainer/Admin Group):
+# LC: If logged in as Trainer/Admin, can delete any Group Session (for simplicity, allow Trainers to delete Sessions of other trainers)
 
 #############################################################################################
 # BRAIN DUMP
@@ -254,4 +270,14 @@ def delete_session(session_id):
 # 3) Ensure you can't create a Session if there's already a Session in that room at that time
 # 4) Ensure you can't edit a Group Session to add more people than the room can hold.
 # 5) Choose routines for the session
+
+# List of Logic Checks TBD for Edit:
+# If member, shud be able to CHOOSE routines for a Session
+# Member should be able to UNREGISTER for group session without destroying it.
+# If trainer/admin, shud be able to CHOOSE Members for a Session
+
+# List of Logic Checks TBD for Delete:
+# If member, can only delete All PERSONAL Sessions that have a MemberSession associated with the Member. Can't delete group sessions
+# If member, deletion of Personal Session should delete the MemberSession and SessionRoutines
+# Can't delete a Session if at least 1 Member has paid for it!
 #############################################################################################
