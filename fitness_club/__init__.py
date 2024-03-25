@@ -43,10 +43,13 @@ def create_app():
     from .dashboard import dashboard
     from .auth import users
     from .models import Member, Trainer, Admin
+    from .health_metrics import health_metrics
+    from .goal_setting import goal_setting_bp
 
-
-    # register the blueprints defined in various files. Usually urlprefix='/': if url_prefix='/auth/' and route was "hello", we must visit /auth/hello
+    # Register the blueprints
     app.register_blueprint(session, url_prefix='/session')
     app.register_blueprint(users, url_prefix='/')
     app.register_blueprint(dashboard, url_prefix='/')
+    app.register_blueprint(health_metrics)
+    app.register_blueprint(goal_setting_bp)
     return app
