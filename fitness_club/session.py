@@ -81,22 +81,42 @@ def session_show(session_id):  # Get the session_id used in the GET request URL
 @login_required 
 def session_new():
     """ This function creates a new Session. """
-    # Only allow session creation if current user is a Member
-    if current_user.role != 'Member': 
-        return redirect(url_for("users.login")) 
 
-    form = SessionForm()
+    # Define whether current_user is Member
+    is_member = current_user.role == 'Member'
 
-    # Here, defining dropdown choices is necessary to show a dropdown for Trainers in the view, as opposed to forcing them to manually enter a trainer_id
+    # Get Routine data to show in the view
+    query_result = Routine.query.all()
+    routines_data = [{'routine_id': routine.routine_id, 'routine_name': routine.name, 'routine_count': 0} for routine in query_result] # Mapping elements of the query_result array to get an array of objects 
+    # routines_data is an array of dictionaries of the form: [
+    #     {'routine_id': 2, 'routine_name': 'pushups', 'routine_count': 0},
+    #     {'routine_id': 4, 'routine_name': 'situps', 'routine_count': 0},
+    # ]
+    # where each dictionary represents a Routine in the Routines table. We list ALL Routines.
+    # routines_data is used to populate each FormField (i.e. each RoutineCountForm) of the routines FieldList with initial data, as shown here: https://stackoverflow.com/questions/28375565/add-input-fields-dynamically-with-wtforms
+    
+    form = SessionForm(routines=routines_data)
+    
+    routine_c_form = RoutineCountForm() # Initializes a form, similar to SessionForm. I'm only doing this to get the label, not super important
+    member_p_form = MemberPaidForm() # Initializes a form, similar to SessionForm. I'm only doing this to get the label, not super important
+
+    # Here, defining dropdown choices is necessary to show a dropdown for Trainers in the view, as opposed to forcing them to manually enter a trainer_id. Same for Rooms.
     form.trainer_id.choices = [(trainer.trainer_id, trainer.first_name + " " + trainer.last_name) for trainer in Trainer.query.all()]
+    form.room_id.choices = [(room.room_id, room.name) for room in Room.query.all()]
+
+    # Only allow session creation if current user is a Member
+    if current_user.role == 'Member': 
+        print('Boo')
+    else:
+        print('Hello')
 
     # ASIDE: If we don't want a Member to be able to populate certain fields, we can delete them for Members, but not for Admins etc: https://wtforms.readthedocs.io/en/3.1.x/specific_problems/#removing-fields-per-instance
     
     # This code runs if form validation is successful
     if form.validate_on_submit():
         # Create a Session using data from form. For security reasons, I am specifying separate values for is_group_booking, pricing & room_id even though they have default values in session_forms.py
-        session = Session(name=form.name.data, start_time=form.start_time.data, end_time=form.end_time.data, trainer_id=form.trainer_id.data, is_group_booking=False, pricing=20, room_id=None)
-        db.session.add(session)
+        sesh = Session(name=form.name.data, start_time=form.start_time.data, end_time=form.end_time.data, trainer_id=form.trainer_id.data, is_group_booking=False, pricing=20, room_id=None)
+        db.session.add(sesh)
         db.session.commit()
         flash(f"Session named {form.name.data} created!", "success")
         return redirect(url_for("session.sessions")) # Go to this page once Session creation succeeds
@@ -105,9 +125,10 @@ def session_new():
     for field, errors in form.errors.items():
         for error in errors:
             flash(f"Error in field '{getattr(form, field).label.text}': {error}", "danger")
-
-    # If form validation unsuccessful, go to this page (error messsages should be flashed too)
-    return render_template("session/new.html", form=form)
+    
+    # ON GET: Go to the below page # https://stackoverflow.com/questions/69529247/how-do-i-pre-fill-a-flask-wtforms-form-with-existing-data-for-an-edit-profile
+    # ON POST: If form validation unsuccessful, also go to the below page (error messsages should be flashed too)
+    return render_template("session/new.html", form=form, routine_c_form=routine_c_form, member_p_form=member_p_form, is_member=is_member)
 
 # EDIT ROUTE
 @session.route("/<int:session_id>/edit", methods=['GET', 'POST'])
@@ -124,8 +145,9 @@ def session_edit(session_id):
 
     form = SessionForm()
 
-    # Here, defining dropdown choices is necessary to show a dropdown for Trainers in the view, as opposed to forcing them to manually enter a trainer_id
+    # Here, defining dropdown choices is necessary to show a dropdown for Trainers in the view, as opposed to forcing them to manually enter a trainer_id. Same for Rooms.
     form.trainer_id.choices = [(trainer.trainer_id, trainer.first_name + " " + trainer.last_name) for trainer in Trainer.query.all()]
+    form.room_id.choices = [(room.room_id, room.name) for room in Room.query.all()]
 
     # This code runs if form validation is successful
     if form.validate_on_submit():

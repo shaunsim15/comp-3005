@@ -21,21 +21,57 @@
         </div>
         <div class="form-group">
             {{ form.is_group_booking.label }}
-            {{ form.is_group_booking(class="form-control", disabled=disabled, style="caret-color: transparent;") }}
+            {% if is_member %}
+                {{ form.is_group_booking(class="form-control", disabled=disabled, style="caret-color: transparent;") }}
+            {% else %}
+                {{ form.is_group_booking(class="form-control") }}
+            {% endif %}
         </div>
         <div class="form-group">
             {{ form.pricing.label }}
-            {{ form.pricing(class="form-control", disabled=disabled, style="caret-color: transparent;") }}
+            {% if is_member %}
+                {{ form.pricing(class="form-control", disabled=disabled, style="caret-color: transparent;") }}
+            {% else %}
+                {{ form.pricing(class="form-control") }}
+            {% endif %}
         </div>
         <div class="form-group">
             {{ form.room_id.label }}
-            <select class="form-control" style="caret-color: transparent;" disabled readonly>
-                <option selected> None </option>
-            </select> 
+            {% if is_member %}
+                <select class="form-control" style="caret-color: transparent;" disabled readonly>
+                    <option selected> None </option>
+                </select>
+            {% else %}
+                <!-- Make things easier, I assume Trainer / Admin MUST pick a room when creating session, regardless of whether group booking or not -->
+                {{ form.room_id(class="form-control") }}
+            {% endif %}
         </div>
         <div class="form-group">
             {{ form.trainer_id.label }}
             {{ form.trainer_id(class="form-control") }}
+        </div>
+        <!-- Dont list Room Occupancy in New- no room whose occupancy we can check -->
+        <div class="form-group">
+            <div> {{form.routines.label}}</div>
+            <table class="table table-bordered">
+                <thead class="thead-dark">
+                    <tr>
+                        <th>{{ routine_c_form.routine_id.label }}</th>
+                        <th>{{ routine_c_form.routine_name.label }}</th>
+                        <th>{{ routine_c_form.routine_count.label }}</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for routine_count_form in form.routines %}
+                        {{ routine_count_form.hidden_tag() }}
+                        <tr>
+                            <td>{{ routine_count_form.routine_id(class="form-control", disabled=disabled, style="caret-color: transparent;") }}</td>
+                            <td>{{ routine_count_form.routine_name(class="form-control", disabled=disabled, style="caret-color: transparent;") }}</td>
+                            <td>{{ routine_count_form.routine_count(class="form-control") }}</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
         </div>
         <div class="form-group">
             <input class="btn btn-primary" id="submit" name="submit" type="submit" value="Create">
