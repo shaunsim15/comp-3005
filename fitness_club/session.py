@@ -2,7 +2,7 @@ from flask import Blueprint, render_template, abort
 
 from fitness_club import db
 from fitness_club.models import Member, MemberSession, Room, Routine, Session, SessionRoutine, Trainer
-from fitness_club.session_forms import RoutineCountForm, SessionForm
+from fitness_club.session_forms import MemberPaidForm, RoutineCountForm, SessionForm
 from flask_login import current_user, login_required
 from flask import Blueprint, render_template, redirect, url_for, request, flash
 from sqlalchemy import or_, union
@@ -51,26 +51,30 @@ def session_show(session_id):  # Get the session_id used in the GET request URL
     # Get Routine data to show in the view
     sess = db.session # https://flask-sqlalchemy.palletsprojects.com/en/3.0.x/quickstart/#query-the-data
     query_result = sess.query(Routine, SessionRoutine).join(SessionRoutine).filter(SessionRoutine.session_id == session_id) # https://stackoverflow.com/questions/6044309/sqlalchemy-how-to-join-several-tables-by-one-query
-    initial_data = [{'routine_id': routine.routine_id, 'routine_name': routine.name, 'routine_count': session_routine.routine_count} for routine, session_routine in query_result] # Mapping elements of the query_result array to get an array of objects 
-    # initial_data is an array of dictionaries of the form: [
+    routines_data = [{'routine_id': routine.routine_id, 'routine_name': routine.name, 'routine_count': session_routine.routine_count} for routine, session_routine in query_result] # Mapping elements of the query_result array to get an array of objects 
+    # routines_data is an array of dictionaries of the form: [
     #     {'routine_id': 2, 'routine_name': 'pushups', 'routine_count': 3},
     #     {'routine_id': 4, 'routine_name': 'situps', 'routine_count': 5},
     # ]
     # where each dictionary represents data from a (joined) record in the SessionRoutine table. Each of these records must be associated with a Session having the session_id in the URL.
-    # initial_data is used to populate each FormField (i.e. each RoutineCountForm) of the routines FieldList with initial data, as shown here: https://stackoverflow.com/questions/28375565/add-input-fields-dynamically-with-wtforms
+    # routines_data is used to populate each FormField (i.e. each RoutineCountForm) of the routines FieldList with initial data, as shown here: https://stackoverflow.com/questions/28375565/add-input-fields-dynamically-with-wtforms
 
     # Get Room data to show in the View
     room_capacity = Room.query.get(session.room_id).capacity if session.room_id is not None else None # Get room_capacity if a Room exists for this session, otherwise room_capacity = None
-    print(room_capacity)
     
     # Get Member data to show in the View
     query_result = sess.query(Member, MemberSession).join(MemberSession).filter(MemberSession.session_id == session_id)
-    member_data = [{'member_id': member.member_id, 'member_name': f'{member.first_name} {member.last_name}', 'has_paid_for': 'Yes' if member_session.has_paid_for else 'No'} for member, member_session in query_result]
+    member_data = [{'member_id': member.member_id, 'member_name': f'{member.first_name} {member.last_name}', 'has_paid_for': member_session.has_paid_for} for member, member_session in query_result]
+    room_slots_filled = len(member_data)
+    room_occupancy = f'{room_slots_filled}/{room_capacity}' if session.room_id else 'No room booked' # Reports the room occupancy e.g. 17/20
+    if current_user.role == 'Member': # If current user is a member, we don't wanna show ANY member_data
+        member_data = None 
 
-    form = SessionForm(routines=initial_data) # Populate the routines FieldList with initial data
+    form = SessionForm(routines=routines_data, members=member_data) # Populate the routines FieldList with initial data, and the members FieldList with initial data 
     routine_c_form = RoutineCountForm() # Initializes a form, similar to SessionForm. I'm only doing this to get the label, not super important
+    member_p_form = MemberPaidForm() # Initializes a form, similar to SessionForm. I'm only doing this to get the label, not super important
     # Display the show view
-    return render_template("session/show.html", session=session, form=form, trainer_name=trainer_name, routine_c_form=routine_c_form)
+    return render_template("session/show.html", session=session, form=form, trainer_name=trainer_name, routine_c_form=routine_c_form, member_p_form=member_p_form, room_occupancy=room_occupancy)
 
 # NEW ROUTE
 @session.route("/new", methods=['GET', 'POST'])
@@ -171,3 +175,5 @@ def delete_session(session_id):
     # session_routines = SessionRoutine.query.join(Routine).filter(
     #     SessionRoutine.session_id == session_id
     # ).all() # This gives an array of SessionRoutines associated with the session_id, not quite what we want: [<SessionRoutine 1, 1>, <SessionRoutine 1, 2>, <SessionRoutine 1, 3>, <SessionRoutine 1, 4>, <SessionRoutine 1, 5>]
+
+# [member for member in member_data if member['member_id'] == current_user.member_id] # member_data may be an empty array if no match found
