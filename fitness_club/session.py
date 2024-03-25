@@ -15,7 +15,6 @@ session = Blueprint('session', __name__) # 'session' is the name of the blueprin
 @session.route('/index', methods=['GET']) # '/index' is also a URL to get to the index view.
 @login_required # This means a user must be logged in to use this view / route https://flask-login.readthedocs.io/en/latest/#login-example
 def sessions():
-    print(current_user.member_id)
     if current_user.role == 'Member': # 'Role' is a custom method we defined on each of the three models.
         # https://stackoverflow.com/questions/7942547/using-or-in-sqlalchemy
         # https://www.slingacademy.com/article/left-outer-join-in-sqlalchemy/
@@ -130,7 +129,8 @@ def session_new():
         else:
             # First, add a Session to the db
             room_id_to_add = None if form.room_id.data < 0 else form.room_id.data
-            sesh = Session(name=form.name.data, start_time=form.start_time.data, end_time=form.end_time.data, trainer_id=form.trainer_id.data, is_group_booking=form.is_group_booking.data, pricing=form.pricing.data, room_id=room_id_to_add) # Create a Session using data from form. For security reasons, I am specifying separate values for is_group_booking, pricing & room_id even though they have default values in session_forms.py
+            is_group_booking_to_add = form.is_group_booking.data == 'True'
+            sesh = Session(name=form.name.data, start_time=form.start_time.data, end_time=form.end_time.data, trainer_id=form.trainer_id.data, is_group_booking=is_group_booking_to_add, pricing=form.pricing.data, room_id=room_id_to_add) # Create a Session using data from form. For security reasons, I am specifying separate values for is_group_booking, pricing & room_id even though they have default values in session_forms.py
             db.session.add(sesh)
             db.session.flush() # Flush to get primary keys, so sesh.session_id works
 
@@ -142,7 +142,7 @@ def session_new():
             
             # Third, add MemberSessions to the db (only one, since Members can only create Personal sessions involving themselves)
             for member in form.members.data: # each member probs looks sth like {'member_id': 1, 'add_to_session': False}
-                if member['add_to_session']:
+                if member['add_to_session'] == 'True':
                     member_session = MemberSession(member_id=member['member_id'], session_id=sesh.session_id, has_paid_for=False)
                     db.session.add(member_session) # Fine to add directly, since this is NEW route, no conflicting existing records
         
