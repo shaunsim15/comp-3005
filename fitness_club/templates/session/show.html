@@ -55,9 +55,9 @@
                 {% for routine_count_form in form.routines %}
                     {{ routine_count_form.hidden_tag() }}
                     <tr>
-                        <td>{{ routine_count_form.routine_id }}</td>
-                        <td>{{ routine_count_form.routine_name }}</td>
-                        <td>{{ routine_count_form.routine_count }}</td>
+                        <td>{{ routine_count_form.routine_id(class="form-control", disabled=true, style="caret-color: transparent;") }}</td>
+                        <td>{{ routine_count_form.routine_name(class="form-control", disabled=true, style="caret-color: transparent;") }}</td>
+                        <td>{{ routine_count_form.routine_count(class="form-control", disabled=true, style="caret-color: transparent;") }}</td>
                     </tr>
                 {% endfor %}
             </tbody>
