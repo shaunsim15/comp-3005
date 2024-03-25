@@ -1,7 +1,8 @@
+from flask import flash
 from flask_wtf import FlaskForm
-from fitness_club.models import Member, Trainer
+from fitness_club.models import Member, Trainer, Admin
 from wtforms import StringField, PasswordField, SubmitField
-from wtforms.validators import DataRequired, Length, Email, EqualTo
+from wtforms.validators import DataRequired, Length, Email, EqualTo, ValidationError
 
 class RegistrationForm(FlaskForm):
     """This class represents the form for registering all users."""
@@ -11,6 +12,14 @@ class RegistrationForm(FlaskForm):
     password = PasswordField('Password', validators=[DataRequired()])
     confirm_password = PasswordField('Confirm Password', validators=[DataRequired(), EqualTo('password')])
     submit = SubmitField('Sign Up')
+
+    def validate_email(self, email):
+        Model = [Member, Admin, Trainer]
+        for model in Model:
+            user = model.query.filter_by(email=email.data).first()
+            if user:
+                flash('Email already exists, please choose another email.', 'danger')
+                raise ValidationError('Email already exists, please choose another email.')
     
 
 class MemberOnlyForm(RegistrationForm):
