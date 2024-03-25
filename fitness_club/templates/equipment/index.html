@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+{% block title %}Equipment Dashboard{% endblock %}
+{% block content %}
+
+<h3 class="display-4 py-3 mx-auto">Equipment</h3>
+
+<table class="table table-bordered">
+    <thead class="thead-dark">
+        <tr>
+            <th>ID</th>
+            <th>Name</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for equipment in equipments %}
+        <tr>
+            <td>{{ equipment.equipment_id }}</td>
+            <td><a href="{{ equipment.equipment_id }}">{{ equipment.name }}</a></td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+<a class="btn btn-primary" href="/equipment/new" role="button">Create new Equipment</a>
+
+{% endblock %}

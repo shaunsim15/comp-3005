@@ -124,6 +124,22 @@ class WeightLog(db.Model):
 
     def __repr__(self):
         return f"<WeightLog date={self.date} member_id={self.member_id}>"
+    
+
+
+class Equipment(db.Model):
+    __tablename__ = 'equipment'
+    
+    equipment_id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(20))
+    last_maintained_date = db.Column(db.Date)
+    days_in_maintenance_interval = db.Column(db.Integer)
+    room_id = db.Column(db.Integer, db.ForeignKey('room.room_id', ondelete='SET NULL'))
+    
+    def __repr__(self):
+        return f"<Equipment equipment_id={self.equipment_id} name={self.name}>"
+
+
 
 
     
