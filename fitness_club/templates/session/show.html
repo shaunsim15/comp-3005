@@ -41,6 +41,19 @@
             <option selected>{{ trainer_name }}</option>
         </select> 
     </div>
+    <div class="form-group">
+        <div> Routines!</div>
+        {% for routine_count_form in form.routines %}
+            {{ routine_count_form.hidden_tag() }}
+            {{ routine_count_form.name(class="form-control") }}
+        {% endfor %}
+
+        <!-- {{ form.routines.label }}
+        {{ form.routines(class="form-control") }}
+        {% for routine in routines %}
+            <div>{{routine.name}} {{routine.calories_burnt}}</div>
+        {% endfor %} -->
+    </div>
     <a class="btn btn-primary py-3" href="{{ session.session_id ~ '/edit' }}" role="button">Edit Session</a>
     <form class="py-3" method="POST" action="{{session.session_id ~ '/delete'}}">
         <button type="submit py-3" class="btn btn-danger">Delete</button>

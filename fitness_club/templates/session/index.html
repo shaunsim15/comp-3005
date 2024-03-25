@@ -11,6 +11,7 @@
             <th>Name</th>
             <th>Start Time</th>
             <th>End Time</th>
+            <th>Group Booking</th>
         </tr>
     </thead>
     <tbody>
@@ -20,6 +21,11 @@
             <td><a href="{{ session.session_id }}">{{ session.name }}</a></td>
             <td>{{ session.start_time }}</td>
             <td>{{ session.end_time }}</td>
+            {% if session.is_group_booking %}
+                <td>Yes</td>
+            {% else %}
+                <td>No</td>
+            {% endif %}
         </tr>
         {% endfor %}
     </tbody>

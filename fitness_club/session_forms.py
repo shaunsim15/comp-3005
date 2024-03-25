@@ -1,8 +1,12 @@
 from flask_wtf import FlaskForm
-from fitness_club.models import Member, Trainer
-from wtforms import StringField, PasswordField, SelectField, SubmitField, DateTimeLocalField, BooleanField, DecimalField, IntegerField
+from fitness_club.models import Member, Routine, Trainer
+from wtforms import FieldList, FormField, SelectMultipleField, StringField, PasswordField, SelectField, SubmitField, DateTimeLocalField, BooleanField, DecimalField, IntegerField
 from wtforms.validators import DataRequired, NumberRange
-  
+
+
+class RoutineCountForm(FlaskForm):
+    routine_count = IntegerField()
+
 # I have been able to use a single SessionForm for both the NEW and EDIT routes, but you may need two separate ones for your purposes (and maybe more for Members, Admins, Trainers, etc)
 class SessionForm(FlaskForm):
     group_booking_choices = [(True, 'Yes'), (False, 'No')] # NOT A FORM FIELD!
@@ -15,5 +19,11 @@ class SessionForm(FlaskForm):
     pricing = DecimalField('Pricing per person per hour (CAD)', validators=[DataRequired(), NumberRange(min=0)], default=20)
     room_id = IntegerField('Room', default=None)
     trainer_id = SelectField('Trainer', coerce=int) # I used a SelectField instead of a boolean for nicer UX
+    # routines = SelectMultipleField('Routines', coerce=int, validators=[DataRequired()])
+    routines = FieldList(FormField(RoutineCountForm), min_entries=0)
+
+    # def populate_routines(self):
+    #     self.routines.choices = [(routine.routine_id, routine.name) for routine in Routine.query.all()]
 
     submit = SubmitField('Create / Update') # This label would get shown on the submit button of both the NEW and EDIT views by default. To add different labels for 'Create' and 'Update', I used my own HTML elements and conditionals.
+
