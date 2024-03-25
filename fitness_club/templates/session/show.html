@@ -42,17 +42,26 @@
         </select> 
     </div>
     <div class="form-group">
-        <div> Routines!</div>
-        {% for routine_count_form in form.routines %}
-            {{ routine_count_form.hidden_tag() }}
-            {{ routine_count_form.name(class="form-control") }}
-        {% endfor %}
-
-        <!-- {{ form.routines.label }}
-        {{ form.routines(class="form-control") }}
-        {% for routine in routines %}
-            <div>{{routine.name}} {{routine.calories_burnt}}</div>
-        {% endfor %} -->
+        <div> {{form.routines.label}}</div>
+        <table class="table table-bordered">
+            <thead class="thead-dark">
+                <tr>
+                    <th>{{ routine_c_form.routine_id.label }}</th>
+                    <th>{{ routine_c_form.routine_name.label }}</th>
+                    <th>{{ routine_c_form.routine_count.label }}</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for routine_count_form in form.routines %}
+                    {{ routine_count_form.hidden_tag() }}
+                    <tr>
+                        <td>{{ routine_count_form.routine_id }}</td>
+                        <td>{{ routine_count_form.routine_name }}</td>
+                        <td>{{ routine_count_form.routine_count }}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
     </div>
     <a class="btn btn-primary py-3" href="{{ session.session_id ~ '/edit' }}" role="button">Edit Session</a>
     <form class="py-3" method="POST" action="{{session.session_id ~ '/delete'}}">

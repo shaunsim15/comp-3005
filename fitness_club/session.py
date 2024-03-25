@@ -2,7 +2,7 @@ from flask import Blueprint, render_template, abort
 
 from fitness_club import db
 from fitness_club.models import Member, MemberSession, Room, Routine, Session, SessionRoutine, Trainer
-from fitness_club.session_forms import SessionForm
+from fitness_club.session_forms import RoutineCountForm, SessionForm
 from flask_login import current_user, login_required
 from flask import Blueprint, render_template, redirect, url_for, request, flash
 from sqlalchemy import or_, union
@@ -35,9 +35,12 @@ def sessions():
 @login_required 
 def session_show(session_id):        
     # Get the session_id used in the GET request URL. Find the associated Session & Trainer. Pass relevant info to the view
-    routine_counts = [{"name": 1},
-                  {"name": 3}]
-    form = SessionForm(routines=routine_counts)
+    initial_data = [
+        {'routine_id': 2, 'routine_name': 'pushups', 'routine_count': 3},
+        {'routine_id': 4, 'routine_name': 'situps', 'routine_count': 5},
+    ]
+    form = SessionForm(routines=initial_data)
+    routine_c_form = RoutineCountForm()
     session = Session.query.get_or_404(session_id)
 
     # If logged in as Member
@@ -51,12 +54,12 @@ def session_show(session_id):
     ).all()
 
     print(routines)
-    form.populate_routines()
+    # form.populate_routines()
 
     trainer = Trainer.query.get_or_404(session.trainer_id)
     trainer_name = trainer.first_name + " " + trainer.last_name
     # Display the show view
-    return render_template("session/show.html", session=session, form=form, trainer_name=trainer_name, routines=routines)
+    return render_template("session/show.html", session=session, form=form, trainer_name=trainer_name, routines=routines, routine_c_form=routine_c_form)
 
 # NEW ROUTE
 @session.route("/new", methods=['GET', 'POST'])

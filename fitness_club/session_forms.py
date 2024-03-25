@@ -5,7 +5,9 @@ from wtforms.validators import DataRequired, NumberRange
 
 
 class RoutineCountForm(FlaskForm):
-    routine_count = IntegerField()
+    routine_id = IntegerField('Routine ID')
+    routine_name = StringField('Routine Name', validators=[DataRequired()])
+    routine_count = IntegerField('Routine Count', default=None)
 
 # I have been able to use a single SessionForm for both the NEW and EDIT routes, but you may need two separate ones for your purposes (and maybe more for Members, Admins, Trainers, etc)
 class SessionForm(FlaskForm):
@@ -20,10 +22,12 @@ class SessionForm(FlaskForm):
     room_id = IntegerField('Room', default=None)
     trainer_id = SelectField('Trainer', coerce=int) # I used a SelectField instead of a boolean for nicer UX
     # routines = SelectMultipleField('Routines', coerce=int, validators=[DataRequired()])
-    routines = FieldList(FormField(RoutineCountForm), min_entries=0)
+    routines = FieldList(FormField(RoutineCountForm), min_entries=2, label='Routines')
 
     # def populate_routines(self):
-    #     self.routines.choices = [(routine.routine_id, routine.name) for routine in Routine.query.all()]
+        # for routine in Routine.query.all():
+        # self.routines = [ {1, "p"}]
+        # self.routines.choices = [(routine.routine_id, routine.name) for routine in Routine.query.all()]
 
     submit = SubmitField('Create / Update') # This label would get shown on the submit button of both the NEW and EDIT views by default. To add different labels for 'Create' and 'Update', I used my own HTML elements and conditionals.
 
