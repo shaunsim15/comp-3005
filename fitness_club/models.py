@@ -39,6 +39,7 @@ class Trainer(db.Model, UserMixin):
     last_name = db.Column(db.String(20))
     email = db.Column(db.String(50), unique=True, nullable=False)
     password = db.Column(db.String(255), nullable=False)
+    schedules = relationship("Schedule", back_populates="trainer")
 
     def __repr__(self):
         return f"Trainer('{self.first_name}', '{self.last_name}', '{self.email}')"
@@ -114,6 +115,14 @@ class Room(db.Model):
     room_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     name = db.Column(db.String(20))
     capacity = db.Column(db.Integer)
+
+class Schedule(db.Model):
+    __tablename__ = 'schedule'
+    trainer_id = db.Column(db.Integer, db.ForeignKey('trainer.trainer_id'), primary_key=True)
+    start_time = db.Column(db.DateTime, primary_key=True)
+    end_time = db.Column(db.DateTime)
+    trainer = relationship("Trainer", back_populates="schedules")
+
 
 class WeightLog(db.Model):
     __tablename__ = 'weight_log'
