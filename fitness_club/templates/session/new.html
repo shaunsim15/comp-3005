@@ -2,8 +2,6 @@
 {% block title %}Create new Session{% endblock %}
 {% block content %}
 
-
-
     <h3 class="display-4 py-3 mx-auto">Create new Session</h3>
     <form method="POST">
         {{ form.hidden_tag() }}
@@ -38,11 +36,8 @@
         <div class="form-group">
             {{ form.room_id.label }}
             {% if is_member %}
-                <select class="form-control" style="caret-color: transparent;" disabled readonly>
-                    <option selected> None </option>
-                </select>
+                {{ form.room_id(class="form-control", disabled=disabled, style="caret-color: transparent;") }}
             {% else %}
-                <!-- Make things easier, I assume Trainer / Admin MUST pick a room when creating session, regardless of whether group booking or not -->
                 {{ form.room_id(class="form-control") }}
             {% endif %}
         </div>
@@ -73,6 +68,30 @@
                 </tbody>
             </table>
         </div>
+        {% if not is_member %}
+            <div class="form-group">
+                <div> {{form.members.label}}</div>
+                <table class="table table-bordered">
+                    <thead class="thead-dark">
+                        <tr>
+                            <th>{{ member_p_form.member_id.label }}</th>
+                            <th>{{ member_p_form.member_name.label }}</th>
+                            <th>{{ member_p_form.add_to_session.label }}</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for member_paid_form in form.members %}
+                            {{ member_paid_form.hidden_tag() }}
+                            <tr>
+                                <td>{{ member_paid_form.member_id(class="form-control", disabled=true, style="caret-color: transparent;") }}</td>
+                                <td>{{ member_paid_form.member_name(class="form-control", disabled=true, style="caret-color: transparent;") }}</td>
+                                <td>{{ member_paid_form.add_to_session(class="form-control") }}</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% endif %}
         <div class="form-group">
             <input class="btn btn-primary" id="submit" name="submit" type="submit" value="Create">
         </div>

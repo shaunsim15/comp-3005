@@ -14,10 +14,12 @@ class RoutineCountForm(FlaskForm):
 # This is the FormField in the FieldList + FormField Combo https://stackoverflow.com/questions/30121763/how-to-use-a-wtforms-fieldlist-of-formfields https://wtforms.readthedocs.io/en/2.3.x/fields/#field-enclosures
 class MemberPaidForm(FlaskForm):
     has_paid_for_choices = [(True, 'Yes'), (False, 'No')] # NOT A FORM FIELD!
+    add_to_session_choices = [(True, 'Yes'), (False, 'No')] # NOT A FORM FIELD!
 
     member_id = IntegerField('Member ID')
     member_name = StringField('Member Name', validators=[DataRequired()])
     has_paid_for = SelectField('Has Paid For', choices=has_paid_for_choices, default=False) # I used a SelectField instead of a Boolean field for nicer UX
+    add_to_session = SelectField('Add to Session?', choices=add_to_session_choices, default=False) # I used a SelectField instead of a Boolean field for nicer UX
 
 # I have been able to use a single SessionForm for both the NEW and EDIT routes, but you may need two separate ones for your purposes (and maybe more for Members, Admins, Trainers, etc)
 class SessionForm(FlaskForm):
@@ -29,10 +31,10 @@ class SessionForm(FlaskForm):
     end_time = DateTimeLocalField('End Time', format='%Y-%m-%dT%H:%M', validators=[DataRequired()])
     is_group_booking = SelectField('Group Booking', choices=group_booking_choices, default=False) # I used a SelectField instead of a Boolean field for nicer UX
     pricing = DecimalField('Pricing per person per hour (CAD)', validators=[DataRequired(), NumberRange(min=0)], default=20)
-    room_id = SelectField('Room', coerce=int) # I used a SelectField instead of a boolean for nicer UX
+    room_id = SelectField('Room', coerce=int, default=-1) # I used a SelectField instead of a boolean for nicer UX. The -1 default corresponds to None, and is hardcoded in the route controller functions
     trainer_id = SelectField('Trainer', coerce=int) # I used a SelectField instead of a boolean for nicer UX
     routines = FieldList(FormField(RoutineCountForm), label='Routines', min_entries=0, validators=[Optional()]) # FieldList + FormField Combo needed because we have nested data within a form. SelectMultipleField is not good enough for the job.
-    members = FieldList(FormField(MemberPaidForm), label='Participants (Members)') # FieldList + FormField Combo needed because we have nested data within a form. SelectMultipleField is not good enough for the job.
+    members = FieldList(FormField(MemberPaidForm), label='Participants (Members)', min_entries=0, validators=[Optional()]) # FieldList + FormField Combo needed because we have nested data within a form. SelectMultipleField is not good enough for the job.
     # Use of Optional- https://prettyprinted.com/tutorials/how-to-use-fieldlist-in-flask-wtf/
 
     submit = SubmitField('Create / Update') # This label would get shown on the submit button of both the NEW and EDIT views by default. To add different labels for 'Create' and 'Update', I used my own HTML elements and conditionals.
