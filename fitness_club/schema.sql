@@ -88,7 +88,7 @@ CREATE TABLE member_session(
     has_paid_for BOOLEAN,
     PRIMARY KEY (member_id, session_id),
     FOREIGN KEY (member_id) REFERENCES member
-        ON DELETE SET NULL,
+        ON DELETE CASCADE,
     FOREIGN KEY (session_id) REFERENCES session
         ON DELETE CASCADE
 );
@@ -169,9 +169,9 @@ VALUES
 
 INSERT INTO achievement (name)
 VALUES
-('1st Session Done'),
-('10 Sessions Done'),
-('25 Sessions Done');
+('1st Session Booked'),
+('10 Sessions Booked'),
+('25 Sessions Booked');
 
 INSERT INTO member_achievement (member_id, achievement_id, date)
 VALUES
@@ -214,12 +214,18 @@ VALUES
 ('Session 2', '2024-03-16 17:00:00', '2024-03-16 18:00:00', true, 20.00, 2, 2),
 ('Session 3', '2024-03-16 18:30:00', '2024-03-16 19:30:00', true, 15.00, 1, 3),
 ('Session 4', '2024-03-16 10:00:00', '2024-03-16 11:00:00', true, 18.00, 3, 4),
-('Session 5', '2024-03-16 18:00:00', '2024-03-16 19:00:00', true, 15.00, 3, 5);
+('Session 5', '2024-03-16 18:00:00', '2024-03-16 19:00:00', true, 15.00, 3, 5),
+('Session 6', '2024-03-17 18:00:00', '2024-03-17 19:00:00', false, 10.00, 3, 4),
+('Session 7', '2024-03-17 20:00:00', '2024-03-17 21:00:00', false, 10.00, 3, 4);
 
 
 INSERT INTO member_session (member_id, session_id, has_paid_for)
 VALUES
 (1, 1, true),
+(1, 2, true),
+(1, 3, false),
+(1, 4, false),
+(1, 7, false),
 (2, 2, true),
 (3, 3, false);
 
@@ -298,6 +304,7 @@ VALUES
 (4, '2024-03-16 09:00:00', '2024-03-16 13:00:00'),
 (4, '2024-03-16 14:00:00', '2024-03-16 18:00:00'),
 (4, '2024-03-16 19:00:00', '2024-03-16 23:00:00'),
+(4, '2024-03-17 00:00:00', '2024-03-17 23:59:59'),
 (5, '2024-03-16 10:00:00', '2024-03-16 14:00:00'),
 (5, '2024-03-16 15:00:00', '2024-03-16 19:00:00'),
 (5, '2024-03-16 20:00:00', '2024-03-16 00:00:00'),

@@ -41,6 +41,58 @@
             <option selected>{{ trainer_name }}</option>
         </select> 
     </div>
+    <div class="form-group">
+        Room Occupancy
+        <p>{{ room_occupancy }}</p>
+    </div>
+    {% if form.routines %}
+        <div class="form-group">
+            <div> {{form.routines.label}}</div>
+            <table class="table table-bordered">
+                <thead class="thead-dark">
+                    <tr>
+                        <th>{{ routine_c_form.routine_id.label }}</th>
+                        <th>{{ routine_c_form.routine_name.label }}</th>
+                        <th>{{ routine_c_form.routine_count.label }}</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for routine_count_form in form.routines %}
+                        {{ routine_count_form.hidden_tag() }}
+                        <tr>
+                            <td>{{ routine_count_form.routine_id(class="form-control", disabled=true, style="caret-color: transparent;") }}</td>
+                            <td>{{ routine_count_form.routine_name(class="form-control", disabled=true, style="caret-color: transparent;") }}</td>
+                            <td>{{ routine_count_form.routine_count(class="form-control", disabled=true, style="caret-color: transparent;") }}</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    {% endif %}
+    {% if form.member_data %}
+        <div class="form-group">
+            <div> {{form.members.label}}</div>
+            <table class="table table-bordered">
+                <thead class="thead-dark">
+                    <tr>
+                        <th>{{ member_p_form.member_id.label }}</th>
+                        <th>{{ member_p_form.member_name.label }}</th>
+                        <th>{{ member_p_form.has_paid_for.label }}</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for member_paid_form in form.members %}
+                        {{ member_paid_form.hidden_tag() }}
+                        <tr>
+                            <td>{{ member_paid_form.member_id(class="form-control", disabled=true, style="caret-color: transparent;") }}</td>
+                            <td>{{ member_paid_form.member_name(class="form-control", disabled=true, style="caret-color: transparent;") }}</td>
+                            <td>{{ member_paid_form.has_paid_for(class="form-control", disabled=true, style="caret-color: transparent;") }}</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    {% endif %}
     <a class="btn btn-primary py-3" href="{{ session.session_id ~ '/edit' }}" role="button">Edit Session</a>
     <form class="py-3" method="POST" action="{{session.session_id ~ '/delete'}}">
         <button type="submit py-3" class="btn btn-danger">Delete</button>

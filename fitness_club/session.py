@@ -1,10 +1,12 @@
 from flask import Blueprint, render_template, abort
 
 from fitness_club import db
-from fitness_club.models import Room, Session, Trainer
-from fitness_club.session_forms import SessionForm
+from fitness_club.models import Member, MemberSession, Room, Routine, Session, SessionRoutine, Trainer
+from fitness_club.session_forms import MemberPaidForm, RoutineCountForm, SessionForm
 from flask_login import current_user, login_required
 from flask import Blueprint, render_template, redirect, url_for, request, flash
+from sqlalchemy import or_, union
+from sqlalchemy.orm import sessionmaker # https://www.geeksforgeeks.org/sqlalchemy-orm-creating-session/
 
 session = Blueprint('session', __name__) # 'session' is the name of the blueprint. __name__ represents the name of the current module. This variable is exported to __init__.py https://flask.palletsprojects.com/en/2.0.x/tutorial/views/
 
@@ -13,28 +15,66 @@ session = Blueprint('session', __name__) # 'session' is the name of the blueprin
 @session.route('/index', methods=['GET']) # '/index' is also a URL to get to the index view.
 @login_required # This means a user must be logged in to use this view / route https://flask-login.readthedocs.io/en/latest/#login-example
 def sessions():
-    if current_user.role != 'Member': # 'Role' is a custom method we defined on each of the three models.
-        return redirect(url_for("users.login")) # redirect generates a redirect response. url_for generates a URL for a given endpoint (specifically, the 'login' route in the 'users' blueprint)
-        
-    sessions = Session.query.all()
+    print(current_user.member_id)
+    if current_user.role == 'Member': # 'Role' is a custom method we defined on each of the three models.
+        # https://stackoverflow.com/questions/7942547/using-or-in-sqlalchemy
+        # https://www.slingacademy.com/article/left-outer-join-in-sqlalchemy/
+        sessions = Session.query.outerjoin(Session.members).filter(
+            or_(
+                Session.members.any(member_id=current_user.member_id), 
+                Session.is_group_booking == True
+                )
+            ).all()
+    else:
+        sessions = Session.query.all()
+    
     # Display the index view
     return render_template("session/index.html", sessions=sessions) # Pass info to the view via the sessions variable.
 
 # SHOW ROUTE
 @session.route("/<int:session_id>", methods=['GET'])
 @login_required 
-def session_show(session_id):
-    # Only show the session page if current user is a Member
-    if current_user.role != 'Member': 
-        return redirect(url_for("users.login")) 
-        
-    # Get the session_id used in the GET request URL. Find the associated Session & Trainer. Pass relevant info to the view
-    form = SessionForm()
-    session = Session.query.get_or_404(session_id) 
+def session_show(session_id):  # Get the session_id used in the GET request URL
+    # Find the Session associated with the session_id
+    session = Session.query.get_or_404(session_id)
+
+    # If logged in as Member
+    if current_user.role == 'Member': 
+        # If the Session to be shown is not a Group session, and is not a Personal Session associated with the Member, don't show the page
+        if (not session.is_group_booking) and (MemberSession.query.filter_by(member_id=current_user.member_id, session_id=session_id).first() == None):
+            abort(404)
+
+    # Find the Trainer associated with the session_id
     trainer = Trainer.query.get_or_404(session.trainer_id)
     trainer_name = trainer.first_name + " " + trainer.last_name
+
+    # Get Routine data to show in the view
+    sess = db.session # https://flask-sqlalchemy.palletsprojects.com/en/3.0.x/quickstart/#query-the-data
+    query_result = sess.query(Routine, SessionRoutine).join(SessionRoutine).filter(SessionRoutine.session_id == session_id) # https://stackoverflow.com/questions/6044309/sqlalchemy-how-to-join-several-tables-by-one-query
+    routines_data = [{'routine_id': routine.routine_id, 'routine_name': routine.name, 'routine_count': session_routine.routine_count} for routine, session_routine in query_result] # Mapping elements of the query_result array to get an array of objects 
+    # routines_data is an array of dictionaries of the form: [
+    #     {'routine_id': 2, 'routine_name': 'pushups', 'routine_count': 3},
+    #     {'routine_id': 4, 'routine_name': 'situps', 'routine_count': 5},
+    # ]
+    # where each dictionary represents data from a (joined) record in the SessionRoutine table. Each of these records must be associated with a Session having the session_id in the URL.
+    # routines_data is used to populate each FormField (i.e. each RoutineCountForm) of the routines FieldList with initial data, as shown here: https://stackoverflow.com/questions/28375565/add-input-fields-dynamically-with-wtforms
+
+    # Get Room data to show in the View
+    room_capacity = Room.query.get(session.room_id).capacity if session.room_id is not None else None # Get room_capacity if a Room exists for this session, otherwise room_capacity = None
+    
+    # Get Member data to show in the View
+    query_result = sess.query(Member, MemberSession).join(MemberSession).filter(MemberSession.session_id == session_id)
+    member_data = [{'member_id': member.member_id, 'member_name': f'{member.first_name} {member.last_name}', 'has_paid_for': member_session.has_paid_for} for member, member_session in query_result]
+    room_slots_filled = len(member_data)
+    room_occupancy = f'{room_slots_filled}/{room_capacity}' if session.room_id else 'No room booked' # Reports the room occupancy e.g. 17/20
+    if current_user.role == 'Member': # If current user is a member, we don't wanna show ANY member_data
+        member_data = None 
+
+    form = SessionForm(routines=routines_data, members=member_data) # Populate the routines FieldList with initial data, and the members FieldList with initial data 
+    routine_c_form = RoutineCountForm() # Initializes a form, similar to SessionForm. I'm only doing this to get the label, not super important
+    member_p_form = MemberPaidForm() # Initializes a form, similar to SessionForm. I'm only doing this to get the label, not super important
     # Display the show view
-    return render_template("session/show.html", session=session, form=form, trainer_name=trainer_name)
+    return render_template("session/show.html", session=session, form=form, trainer_name=trainer_name, routine_c_form=routine_c_form, member_p_form=member_p_form, room_occupancy=room_occupancy)
 
 # NEW ROUTE
 @session.route("/new", methods=['GET', 'POST'])
@@ -54,8 +94,8 @@ def session_new():
     
     # This code runs if form validation is successful
     if form.validate_on_submit():
-        # Create a Session using data from form. Note that I can omit specifying is_group_booking, pricing & room_id. since they have default values defined in session_forms.py
-        session = Session(name=form.name.data, start_time=form.start_time.data, end_time=form.end_time.data, trainer_id=form.trainer_id.data)
+        # Create a Session using data from form. For security reasons, I am specifying separate values for is_group_booking, pricing & room_id even though they have default values in session_forms.py
+        session = Session(name=form.name.data, start_time=form.start_time.data, end_time=form.end_time.data, trainer_id=form.trainer_id.data, is_group_booking=False, pricing=20, room_id=None)
         db.session.add(session)
         db.session.commit()
         flash(f"Session named {form.name.data} created!", "success")
@@ -127,14 +167,13 @@ def delete_session(session_id):
     flash('Your session has been deleted!', 'success')
     return redirect(url_for('session.sessions'))
 
-# List of Logic Checks TBD for Members:
-# 1) Add to MemberSession table whenever you make a Session with given Member
-# 2) Ensure you can't view/edit/delete personal sessions that don't involve you
-# 3) Ensure you can't delete group sessions that don't involve you
-# 4) Whenever a MemberSession is added, add triggers that check Achievement milestones for Members.
+# UNUSED SHOW ROUTE CODE:
+    # routines = Routine.query.join(Routine.sessions).filter(
+    #     Routine.sessions.any(session_id=session_id)
+    # ).all() # This gives an array of Routines associated with the session_id, not quite what we want: [<Routine 1>, <Routine 2>, <Routine 3>, <Routine 4>, <Routine 5>]
 
-# List of Logic Checks TBD for Everyone:
-# 1) Ensure you can't create a Session with start_time <= end_time
-# 2) Ensure you can't create a Session if trainer unavailable
-# 3) Ensure you can't create a Session if there's already a Session in that room at that time
-# 4) Ensure you can't edit a Group Session to add more people than the room can hold.
+    # session_routines = SessionRoutine.query.join(Routine).filter(
+    #     SessionRoutine.session_id == session_id
+    # ).all() # This gives an array of SessionRoutines associated with the session_id, not quite what we want: [<SessionRoutine 1, 1>, <SessionRoutine 1, 2>, <SessionRoutine 1, 3>, <SessionRoutine 1, 4>, <SessionRoutine 1, 5>]
+
+# [member for member in member_data if member['member_id'] == current_user.member_id] # member_data may be an empty array if no match found

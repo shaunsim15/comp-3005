@@ -17,6 +17,8 @@ class Member(db.Model, UserMixin): # Member inherits from 2 classes. db.Model is
     goal_date= db.Column(db.Date)
     height = db.Column(db.Numeric(5, 2))
 
+    sessions = db.relationship('Session', secondary='member_session', backref='members')
+
     def __repr__(self): # Provides a stringificaiton of the member object, kinda like toString() in Java
         return f"Member('{self.first_name}', '{self.last_name}', '{self.email}')"
 
@@ -83,6 +85,28 @@ class Session(db.Model):
     room = db.relationship('Room', backref=db.backref('sessions', lazy=True))
     trainer = db.relationship('Trainer', backref=db.backref('sessions', lazy=True))
 
+class MemberSession(db.Model):
+    __tablename__ = 'member_session'
+    member_id = db.Column(db.Integer, db.ForeignKey('member.member_id'), primary_key=True)
+    session_id = db.Column(db.Integer, db.ForeignKey('session.session_id'), primary_key=True)
+    has_paid_for = db.Column(db.Boolean)
+
+class Routine(db.Model):
+    __tablename__ = 'routine'
+    routine_id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(20))
+    calories_burnt = db.Column(db.Integer)
+    sessions = db.relationship('Session', secondary='session_routine', backref='routines')
+
+class SessionRoutine(db.Model):
+    __tablename__ = 'session_routine'
+    session_id = db.Column(db.Integer, db.ForeignKey('session.session_id'), primary_key=True)
+    routine_id = db.Column(db.Integer, db.ForeignKey('routine.routine_id'), primary_key=True)
+    routine_count = db.Column(db.Integer)
+    
+    # relationship to Session and Routine model
+    # session = db.relationship('Session', backref='session_routines')
+    # routine = db.relationship('Routine', backref='session_routines')
 
 class Room(db.Model):
     __tablename__ = 'room'
