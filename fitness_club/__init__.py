@@ -45,6 +45,7 @@ def create_app():
     from .models import Member, Trainer, Admin
     from .health_metrics import health_metrics
     from .goal_setting import goal_setting_bp
+    from .equipment import equipment
 
     # Register the blueprints
     app.register_blueprint(session, url_prefix='/session')
@@ -52,4 +53,5 @@ def create_app():
     app.register_blueprint(dashboard, url_prefix='/')
     app.register_blueprint(health_metrics)
     app.register_blueprint(goal_setting_bp)
+    app.register_blueprint(equipment, url_prefix='/equipment')
     return app

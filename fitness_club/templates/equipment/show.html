@@ -1,0 +1,28 @@
+{% extends 'base.html' %}
+{% block title %} {{ equipment.name }} {% endblock %}
+
+{% block content %}
+<h3 class="display-4 py-3 mx-auto">Equipment {{ equipment.equipment_id }}</h3>
+    <div class="form-group">
+        <label for="name">Name</label>
+        <input type="text" id="name" class="form-control" value="{{ equipment.name }}" style="caret-color: transparent;" disabled readonly>
+    </div>
+    <div class="form-group">
+        <label for="last_maintained_date">Last Maintained Date</label>
+        <input type="text" id="last_maintained_date" class="form-control" value="{{ equipment.last_maintained_date }}" style="caret-color: transparent;" disabled readonly>
+    </div>
+    <div class="form-group">
+        <label for="days_in_maintenance_interval">Days in Maintenance Interval</label>
+        <input type="text" id="days_in_maintenance_interval" class="form-control" value="{{ equipment.days_in_maintenance_interval }}" style="caret-color: transparent;" disabled readonly>
+    </div>
+    <div class="form-group">
+        <label for="room_id">Room ID</label>
+        <select id="room_id" class="form-control" style="caret-color: transparent;" disabled readonly>
+            <option selected>{{ equipment.room_id }}</option>
+        </select> 
+    </div>
+    <a class="btn btn-primary py-3" href="{{ equipment.equipment_id ~ '/edit' }}" role="button">Edit Equipment</a>
+    <form class="py-3" method="POST" action="{{ equipment.equipment_id ~ '/delete' }}">
+        <button type="submit" class="btn btn-danger">Delete</button>
+    </form>
+{% endblock %}
