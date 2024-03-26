@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+
+{% block title %}Member Profile{% endblock %}
+
+{% block content %}
+    <div class="container py-3">
+        <h2 class="text-center">{{ member.first_name }}'s Profile</h2>
+        <div class="card">
+            <h5 class="card-header">Member Details</h5>
+            <div class="card-body">
+                <h5 class="card-title">{{ member.first_name }} {{ member.last_name }}</h5>
+                <p class="card-text">
+                    <strong>Email:</strong> {{ member.email }} <br />
+                    <strong>Goal Weight:</strong> {{ member.goal_weight }} <br />
+                    <strong>Goal Date:</strong> {{ member.goal_date }} <br />
+                    <strong>Height:</strong> {{ member.height }} <br />
+                </p>
+            </div>
+        </div>
+     </div>
+{% endblock %}
