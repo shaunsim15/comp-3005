@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+{% block title %}Billings{% endblock %}
+{% block content %}
+
+<h3 class="display-4 py-3 mx-auto">Billings</h3>
+
+<table class="table table-bordered">
+    <thead class="thead-dark">
+        <tr>
+            <th>ID</th>
+            <th>Name</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for member in members %}
+        <tr>
+            <td>{{ member.member_id }}</td>
+            <td><a href="{{ member.member_id }}">{{ member.first_name }} {{ member.last_name }}</a></td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+{% endblock %}

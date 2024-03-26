@@ -1,0 +1,55 @@
+{% extends 'base.html' %}
+{% block title %} {{ member['first_name'] }} {{ member['last_name'] }} {% endblock %}
+
+{% block content %}
+<h3 class="display-4 py-3 mx-auto">{{ member['first_name'] }} {{ member['last_name'] }}'s Payments Page</h3>
+    <form method="POST">
+        {{ form.hidden_tag() }}
+        <div class="form-group">
+            <h5 class="display-5 py-3 mx-auto"> {{form.unpaid_sessions.label}}</h5>
+            <table class="table table-bordered">
+                <thead class="thead-dark">
+                    <tr>
+                        <th>{{ billing_subform.session_id.label }}</th>
+                        <th>{{ billing_subform.session_name.label }}</th>
+                        <th>{{ billing_subform.pricing.label }}</th>
+                        <th>{{ billing_subform.payment_choice.label }}</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for subform in form.unpaid_sessions %}
+                        {{ subform.hidden_tag() }}
+                        <tr>
+                            <td>{{ subform.session_id(class="form-control", disabled=true, style="caret-color: transparent;") }}</td>
+                            <td>{{ subform.session_name(class="form-control", disabled=true, style="caret-color: transparent;") }}</td>
+                            <td>{{ subform.pricing(class="form-control", disabled=true, style="caret-color: transparent;") }}</td>
+                            <td>{{ subform.payment_choice(class="form-control", value="False") }}</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        <div class="form-group">
+            {{ form.submit(class="btn btn-primary") }}
+        </div>
+    </form>
+    <h5 class="display-5 py-3 mx-auto"> Paid Sessions</h5>
+    <table class="table table-bordered">
+        <thead class="bg-success text-white">
+            <tr>
+                <th>{{ billing_subform.session_id.label }}</th>
+                <th>{{ billing_subform.session_name.label }}</th>
+                <th>{{ billing_subform.pricing.label }}</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for paid_session in paid_session_data %}
+            <tr>
+                <td>{{ paid_session.session_id }}</td>
+                <td>{{ paid_session.session_name }}</td>
+                <td>{{ paid_session.pricing }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+{% endblock %}
