@@ -39,6 +39,7 @@ def create_app():
         db.session.commit()
 
     # import Blueprint class instances from files
+    from .billing import billing
     from .session import session
     from .dashboard import dashboard
     from .auth import users
@@ -49,6 +50,7 @@ def create_app():
     from .home import home
 
     # Register the blueprints
+    app.register_blueprint(billing, url_prefix='/billing')
     app.register_blueprint(session, url_prefix='/session')
     app.register_blueprint(users, url_prefix='/')
     app.register_blueprint(dashboard, url_prefix='/')
