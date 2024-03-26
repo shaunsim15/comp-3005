@@ -46,11 +46,13 @@ def create_app():
     from .health_metrics import health_metrics
     from .goal_setting import goal_setting_bp
     from .equipment import equipment
+    from .home import home
 
     # Register the blueprints
     app.register_blueprint(session, url_prefix='/session')
     app.register_blueprint(users, url_prefix='/')
     app.register_blueprint(dashboard, url_prefix='/')
+    app.register_blueprint(home, url_prefix='/')
     app.register_blueprint(health_metrics)
     app.register_blueprint(goal_setting_bp)
     app.register_blueprint(equipment, url_prefix='/equipment')

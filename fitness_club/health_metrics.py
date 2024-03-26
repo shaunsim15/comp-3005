@@ -26,6 +26,6 @@ def log_weight():
             weight_log = WeightLog(weight=weight, date=date, member_id=member.member_id)
             db.session.add(weight_log)
             db.session.commit()
-            return redirect(url_for('dashboard.index'))  
+            return redirect(url_for('home.index'))  
         
     return render_template("health_metrics.html", log_weight_form=log_weight_form)

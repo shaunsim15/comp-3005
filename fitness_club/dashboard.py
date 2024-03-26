@@ -5,8 +5,7 @@ from flask import Blueprint, render_template
 
 dashboard = Blueprint("dashboard", __name__)
 
-@dashboard.route("/")
-@dashboard.route("/index")
+@dashboard.route("/dashboard")
 @login_required
 def index():
     """ This route renders the dashboard page. """
