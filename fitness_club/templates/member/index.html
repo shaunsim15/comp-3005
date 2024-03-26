@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+{% block title %}Home{% endblock %}
+{% block content %}
+
+<h3 class="display-4 py-3 mx-auto">Members</h3>
+
+<form action="{{ url_for('member.members') }}" method="post" class="col-lg-6 col-md-8 offset-md-2 offset-lg-3">
+    <input type="text" name="search_term" placeholder="Enter Member Name or Email" class="w-75 center" required>
+    <input type="submit" value="Search" class="btn btn-primary">
+</form>
+
+<table class="table table-bordered">
+    <thead class="thead-dark">
+        <tr>
+            <th>Email</th>
+            <th>First Name</th>
+            <th>Last Name</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for member in members %}
+        <tr>
+            <td>
+                <a href="{{ url_for('member.member_show', member_id=member.member_id) }}">{{ member.email }}</a>
+            </td>
+            <td>{{ member.first_name }}</td>
+            <td>{{ member.last_name }}</td>
+         </tr>
+    </tbody>
+    {% endfor %}
+</table>
+    
+{% endblock %}
