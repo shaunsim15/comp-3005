@@ -16,15 +16,42 @@
     <div class="collapse navbar-collapse" id="navbarNavDropdown">
       <ul class="navbar-nav">
         {% if current_user.is_authenticated %}
+        <li class="nav-item">
+          <p class="nav-link"> {{current_user.role}}</p>
+        </li>
         <li class="nav-item active">
-          <a class="nav-link" href="#">Home <span class="sr-only">(current)</span></a>
+          <a class="nav-link" href="/">Home <span class="sr-only">(current)</span></a>
         </li>
         <li class="nav-item active">
           <a class="nav-link" href="/logout">Log Out  </a>
         </li>
-        <li class="nav-item">
-          <p class="nav-link"> {{current_user.role}}</p>
-        </li>
+         {% if current_user.role == 'Member' %}
+          <li class="nav-item">
+            <a class="nav-link" href="/member-goals">Goals</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="/log-weight">Health Metrics</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="/session">Session</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="/dashboard">Dashboard</a>
+          </li>
+          {% endif %}
+          {% if current_user.role == 'Trainer' %}
+          <li class="nav-item">
+            <a class="nav-link" href="/schedule">Schedule</a>
+          </li>
+          {% endif %}
+          {% if current_user.role == 'Admin' %}
+          <li class="nav-item">
+            <a class="nav-link" href="/equipment">Equipment</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="/room">Room</a>
+          </li>
+          {% endif %}
         {% else %}
         <li class="nav-item">
           <a class="nav-link" href="/register">Sign Up</a>

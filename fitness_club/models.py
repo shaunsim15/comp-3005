@@ -23,7 +23,7 @@ class Member(db.Model, UserMixin): # Member inherits from 2 classes. db.Model is
         return f"Member('{self.first_name}', '{self.last_name}', '{self.email}')"
 
     def get_id(self): # Gets the member_id in string form, just a method for instances of this class. Needed for the Flask-Login extension to work
-        return str(self.member_id)
+        return str(self.email)
 
     @property # This decorator allows defining a method that can be accessed like an attribute. Role is a property of the Member class
     def role(self):
@@ -44,7 +44,7 @@ class Trainer(db.Model, UserMixin):
         return f"Trainer('{self.first_name}', '{self.last_name}', '{self.email}')"
 
     def get_id(self):
-        return str(self.trainer_id)
+        return str(self.email)
 
     @property
     def role(self):
@@ -62,7 +62,7 @@ class Admin(db.Model, UserMixin):
     last_name = db.Column(db.String(20))
 
     def get_id(self):
-        return str(self.admin_id)
+        return str(self.email)
 
     @property
     def role(self):

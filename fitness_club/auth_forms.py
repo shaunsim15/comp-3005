@@ -14,6 +14,7 @@ class RegistrationForm(FlaskForm):
     submit = SubmitField('Sign Up')
 
     def validate_email(self, email):
+        '''To ensure that every email is unique in the database.'''
         Model = [Member, Admin, Trainer]
         for model in Model:
             user = model.query.filter_by(email=email.data).first()

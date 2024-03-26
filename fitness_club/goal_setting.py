@@ -28,6 +28,6 @@ def goal_setting():
             member.goal_date = goal_date
             db.session.commit()
             # Redirect to dashboard
-            return redirect(url_for('dashboard.index'))
+            return redirect(url_for('home.index'))
 
     return render_template("goal_setting.html", goal_form=goal_form)

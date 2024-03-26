@@ -19,7 +19,7 @@ def index():
     # Check if current user is an admin
     if current_user.role != 'Admin':  # Adjust authorization logic as needed
         flash("You are not authorized to see equipment.", "danger")
-        return redirect(url_for("dashboard.index"))
+        return redirect(url_for("home.index"))
     
     # Retrieve equipment data
     equipments = Equipment.query.all()
@@ -35,7 +35,7 @@ def equipment_show(equipment_id):
     # Check if current user is an admin
     if current_user.role != 'Admin':  # Adjust authorization logic as needed
         flash("You are not authorized to see equipment.", "danger")
-        return redirect(url_for("dashboard.index"))
+        return redirect(url_for("home.index"))
     
     # Find the equipment associated with the equipment_id and aborts with 404 if not found https://flask-sqlalchemy.palletsprojects.com/en/2.x/api/#flask_sqlalchemy.BaseQuery.get_or_404
     equipment = Equipment.query.get_or_404(equipment_id)
@@ -51,7 +51,7 @@ def equipment_new():
     # Check if current user is an admin
     if current_user.role != 'Admin':  # Adjust authorization logic as needed
         flash("You are not authorized to add new equipment.", "danger")
-        return redirect(url_for("dashboard.index"))
+        return redirect(url_for("home.index"))
     
     form = EquipmentForm()
 
@@ -105,7 +105,7 @@ def equipment_edit(equipment_id):
     # Check if current user is an admin
     if current_user.role != 'Admin':  # Adjust authorization logic as needed
         flash("You are not authorized to edit equipment.", "danger")
-        return redirect(url_for("dashboard.index"))
+        return redirect(url_for("home.index"))
     
     equipment = Equipment.query.get_or_404(equipment_id)
 

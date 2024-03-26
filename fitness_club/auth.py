@@ -8,10 +8,10 @@ from flask import Blueprint, render_template, redirect, url_for, request, flash
 users = Blueprint("auth", __name__, url_prefix="/auth")
 
 @login_manager.user_loader # This decorator registers load_user as the callback function to be used by Flask Login for loading a user object from the session https://flask-login.readthedocs.io/en/latest/#how-it-works
-def load_user(user_id):
+def load_user(email):
     """ This function is used to reload the user object from the user ID stored in the session. """
     for Model in [Member, Trainer, Admin]:
-        user = Model.query.get(int(user_id))
+        user = Model.query.filter_by(email=email).first()
         if user:
             return user
 
@@ -20,7 +20,7 @@ def load_user(user_id):
 def register():
     """ This function registers a new user. """
     if current_user.is_authenticated:
-        return redirect(url_for("dashboard.index"))
+        return redirect(url_for("home.index"))
 
     user_role = request.args.get("user_role") # Get the type parameter from the url.
     if user_role == "member":
@@ -50,7 +50,7 @@ def register():
 def login():
     """ This function logs in a user. """
     if current_user.is_authenticated:
-        return redirect(url_for("dashboard.index"))
+        return redirect(url_for("home.index"))
     
     form = LoginForm()
     if form.validate_on_submit():
@@ -66,7 +66,7 @@ def login():
             return redirect(url_for("auth.login"))
 
         login_user(user, remember=form.remember.data)
-        return redirect(url_for("dashboard.index"))
+        return redirect(url_for("home.index"))
     return render_template("auth/login.html", form=form)
 
 
@@ -75,4 +75,5 @@ def logout():
     """ This function logs out a user. """
     logout_user()
     return redirect(url_for("auth.login"))
-    
+
+
