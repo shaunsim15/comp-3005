@@ -16,9 +16,14 @@ billing = Blueprint('billing', __name__) # 'billing' is the name of the blueprin
 @billing.route('/index', methods=['GET']) # '/index' is also a URL to get to the index view.
 @login_required # This means a user must be logged in to use this view / route https://flask-login.readthedocs.io/en/latest/#login-example
 def billings():
-    if current_user.role != 'Admin':
+    if current_user.role == 'Trainer':
         return redirect(url_for("auth.login"))
-    members = Member.query.all()
+    
+    members = None
+    if current_user.role == 'Member':
+        members = Member.query.filter_by(member_id=current_user.member_id).all()
+    else:
+        members = Member.query.all()
     
     # Display the index view
     return render_template("billing/index.html", members=members) # Pass info to the view via the members variable.
@@ -84,19 +89,24 @@ def billing_edit(member_id):
             paid_session_data.append(session)
         else:
             del session['has_paid_for']
-            session['payment_choice'] = False
-            unpaid_session_data.append(session)   
+            session['payment_choice'] = 'No'
+            unpaid_session_data.append(session)
 
     form = BillingForm(unpaid_sessions=unpaid_session_data) # Populate the unpaid_sessions FieldList with initial data 
     billing_subform = BillingSubForm() # Initializes a form, similar to SessionForm. I'm only doing this to get the label, not super important
 
     # This code runs if form validation is successful
     if form.validate_on_submit():
-
         # Update MemberSessions in the db (only the has_paid_for attribute, if it needs updating)
         for sesh in form.unpaid_sessions.data:
-            if sesh['payment_choice'] == 'True':
-                member_session = MemberSession.query.get_or_404(member_id=current_user.member_id, session_id=sesh['session_id'], has_paid_for = False) # Confirm has_paid_for is False, tho should alrd be.
+            if sesh['payment_choice'] == 'Yes':
+                member_session =  MemberSession.query.filter_by(
+                    member_id=current_user.member_id,
+                    session_id=sesh['session_id'],
+                    has_paid_for=False # Confirm has_paid_for is False, tho should alrd be.
+                ).first()
+                if member_session is None:
+                    abort(404) 
                 member_session.has_paid_for = True
         db.session.commit() # Commit to db
 

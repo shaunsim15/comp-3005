@@ -4,7 +4,7 @@ from wtforms import FieldList, FormField, SelectMultipleField, StringField, Pass
 from wtforms.validators import DataRequired, NumberRange
 
 class BillingSubForm(FlaskForm): # This represents a Session that has not been paid for
-    payment_choices = [(True, 'Yes'), (False, 'No')] # NOT A FORM FIELD!
+    payment_choices = [('Yes', 'Yes'), ('No', 'No')] # NOT A FORM FIELD!
 
     session_id = IntegerField('Session ID')
     session_name = StringField('Session Name', validators=[DataRequired()])

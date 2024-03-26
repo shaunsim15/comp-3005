@@ -4,6 +4,7 @@
 {% block content %}
 <h3 class="display-4 py-3 mx-auto">{{ member['first_name'] }} {{ member['last_name'] }}'s Payments Page</h3>
     <form method="POST">
+        {{ form.hidden_tag() }}
         <div class="form-group">
             <h5 class="display-5 py-3 mx-auto"> {{form.unpaid_sessions.label}}</h5>
             <table class="table table-bordered">
@@ -22,7 +23,7 @@
                             <td>{{ subform.session_id(class="form-control", disabled=true, style="caret-color: transparent;") }}</td>
                             <td>{{ subform.session_name(class="form-control", disabled=true, style="caret-color: transparent;") }}</td>
                             <td>{{ subform.pricing(class="form-control", disabled=true, style="caret-color: transparent;") }}</td>
-                            <td>{{ subform.payment_choice(class="form-control") }}</td>
+                            <td>{{ subform.payment_choice(class="form-control", value="False") }}</td>
                         </tr>
                     {% endfor %}
                 </tbody>
