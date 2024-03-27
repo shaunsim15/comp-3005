@@ -46,6 +46,54 @@
             </select>
         </div>
         <div class="form-group">
+            Room Occupancy
+            <p>{{ room_occupancy }}</p>
+        </div>
+        <div class="form-group">
+            <div> {{form.routines.label}}</div>
+            <table class="table table-bordered">
+                <thead class="thead-dark">
+                    <tr>
+                        <th>{{ routine_c_form.routine_id.label }}</th>
+                        <th>{{ routine_c_form.routine_name.label }}</th>
+                        <th>{{ routine_c_form.routine_count.label }}</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for routine_count_form in form.routines %}
+                        {{ routine_count_form.hidden_tag() }}
+                        <tr>
+                            <td>{{ routine_count_form.routine_id(class="form-control", disabled=disabled, style="caret-color: transparent;") }}</td>
+                            <td>{{ routine_count_form.routine_name(class="form-control", disabled=disabled, style="caret-color: transparent;") }}</td>
+                            <td>{{ routine_count_form.routine_count(class="form-control") }}</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        <div class="form-group">
+            <div> {{form.members.label}}</div>
+            <table class="table table-bordered">
+                <thead class="thead-dark">
+                    <tr>
+                        <th>{{ member_p_form.member_id.label }}</th>
+                        <th>{{ member_p_form.member_name.label }}</th>
+                        <th>{{ member_p_form.add_to_session.label }}</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for member_paid_form in form.members %}
+                        {{ member_paid_form.hidden_tag() }}
+                        <tr>
+                            <td>{{ member_paid_form.member_id(class="form-control", disabled=true, style="caret-color: transparent;") }}</td>
+                            <td>{{ member_paid_form.member_name(class="form-control", disabled=true, style="caret-color: transparent;") }}</td>
+                            <td>{{ member_paid_form.add_to_session(class="form-control") }}</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        <div class="form-group">
             <input class="btn btn-primary" id="submit" name="submit" type="submit" value="Update">
         </div>
     </form>
