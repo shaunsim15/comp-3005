@@ -6,23 +6,6 @@ from fitness_club.models import Member, Room, Routine, Schedule, Session, Traine
 from wtforms import FieldList, FormField, SelectMultipleField, StringField, PasswordField, SelectField, SubmitField, DateTimeLocalField, BooleanField, DecimalField, IntegerField, ValidationError
 from wtforms.validators import DataRequired, NumberRange, Optional
 
-# def validate_members(self, members): # Normal validate method didnt get called. This Custom validation method also doesnt get called. https://wtforms.readthedocs.io/en/3.1.x/validators/#custom-validators
-#     # If group session, all is good, no need to validate
-#     print("VALIDATE MEMBERS")
-#     print(self.is_group_booking.data)
-#     if self.is_group_booking.data == 'Yes':
-#         return True
-
-#     # If personal session, check that there's at most one member enrolled
-#     member_count = 0
-#     for member_paid_form in self.members.entries:
-#         print(member_paid_form.add_to_session.data)
-#         if member_paid_form.add_to_session.data == 'Yes':
-#             member_count += 1
-#             if member_count > 1:
-#                 raise ValidationError('Cannot have more than 1 member for a Personal Session')
-#     return True
-
 # This is the FormField in the FieldList + FormField Combo https://stackoverflow.com/questions/30121763/how-to-use-a-wtforms-fieldlist-of-formfields https://wtforms.readthedocs.io/en/2.3.x/fields/#field-enclosures
 class RoutineCountForm(FlaskForm):
     routine_id = IntegerField('Routine ID')
