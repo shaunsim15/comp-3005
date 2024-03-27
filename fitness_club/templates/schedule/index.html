@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container">
+    <h2>My Schedules</h2>
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Start Time</th>
+                <th>End Time</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for schedule in schedules %}
+            <tr>
+                <td>{{ schedule.start_time.strftime('%Y-%m-%d %H:%M') }}</td>
+                <td>{{ schedule.end_time.strftime('%Y-%m-%d %H:%M') }}</td>
+                <td>
+                    <a href="{{ url_for('schedule.edit_schedule', trainer_id=schedule.trainer_id) }}">Edit</a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    <a href="{{ url_for('schedule.new_schedule') }}" class="btn btn-primary">Add New Schedule</a>
+</div>
+{% endblock %}

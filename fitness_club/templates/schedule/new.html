@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+
+{% block title %}New Schedule{% endblock %}
+{% block content %}
+<form method="POST" action="{{ url_for('schedule.create_schedule') }}">
+    {{ form.hidden_tag() }}
+    <div class="form-group">
+        {{ form.start_time.label(class="form-control-label") }}
+        {{ form.start_time(class="form-control") }}
+    </div>
+    <div>
+        {{ form.end_time.label(class="form-control-label") }}
+        {{ form.end_time(class="form-control") }}
+    </div>
+    {{ form.submit(class="btn btn-primary")}}
+</form>
+{% endblock %}
