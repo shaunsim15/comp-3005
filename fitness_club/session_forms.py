@@ -10,7 +10,7 @@ from wtforms.validators import DataRequired, NumberRange, Optional
 class RoutineCountForm(FlaskForm):
     routine_id = IntegerField('Routine ID')
     routine_name = StringField('Routine Name', validators=[DataRequired()])
-    routine_count = IntegerField('Routine Count', default=None, validators=[Optional()])
+    routine_count = IntegerField('Routine Count', default=None, validators=[DataRequired()])
 
     def validate_routine_count(self, routine_count): # method automatically called during form validation as it follows the naming convention validate_<field_name>
         if routine_count.data is not None and routine_count.data < 0: # This serves as an extra check, though in effect does nothing; even though the method is being called, routine_count.data is ALWAYS 0 for any negative num due to some Form weirdness.
@@ -53,6 +53,12 @@ class SessionForm(FlaskForm):
 
     def validate_room_id(self, room_id):
         print("VALIDATE Room")
+        print(self.room_id)
+        print(self.room_id.name)
+        print(self.room_id.choices)
+        print(self.room_id.label)
+        print(self.room_id.id)
+        print(self.room_id.data)
 
         # Check the current room (assuming we've booked a room) has enough space
         current_room = Room.query.filter(Room.room_id == self.room_id.data).first()
@@ -91,13 +97,14 @@ class SessionForm(FlaskForm):
             raise ValidationError('Must book a room for a group sesion.')
 
         # If personal session, check that there's at most one member enrolled
-        member_count = 0
-        for member_paid_form in self.members.entries:
-            print(member_paid_form.add_to_session.data)
-            if member_paid_form.add_to_session.data == 'Yes':
-                member_count += 1
-                if member_count > 1:
-                    raise ValidationError('Cannot have more than 1 member for a Personal Session')       
+        if is_group_booking.data == 'No':
+            member_count = 0
+            for member_paid_form in self.members.entries:
+                print(member_paid_form.add_to_session.data)
+                if member_paid_form.add_to_session.data == 'Yes':
+                    member_count += 1
+                    if member_count > 1:
+                        raise ValidationError('Cannot have more than 1 member for a Personal Session')       
 
         return True
 

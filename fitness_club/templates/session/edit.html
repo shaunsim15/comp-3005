@@ -32,9 +32,11 @@
         </div>
         <div class="form-group">
             {{ form.room_id.label }}
-            <select class="form-control" style="caret-color: transparent;" disabled readonly>
-                <option selected>{{ session.room_id }}</option>
-            </select> 
+            {% if is_member %}
+                {{ form.room_id(class="form-control", disabled=disabled, style="caret-color: transparent;") }}
+            {% else %}
+                {{ form.room_id(class="form-control") }}    
+            {% endif %}
         </div>
         <div class="form-group">
             {{ form.trainer_id.label }}

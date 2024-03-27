@@ -72,6 +72,9 @@ def session_show(session_id):  # Get the session_id used in the GET request URL
     form = SessionForm(routines=routines_data, members=members_data) # Populate the routines FieldList with initial data, and the members FieldList with initial data 
     routine_c_form = RoutineCountForm() # Initializes a form, similar to SessionForm. I'm only doing this to get the label, not super important
     member_p_form = MemberPaidForm() # Initializes a form, similar to SessionForm. I'm only doing this to get the label, not super important
+    form.room_id.data = session.room_id
+    form.room_id.choices = [(room.room_id, room.name) for room in Room.query.all()]
+    form.room_id.choices.insert(0, (-1, 'None')) # Create a dummy room option with room_id = -1 and name = 'None'. Insert at index 0
     # Display the show view
     return render_template("session/show.html", session=session, form=form, trainer_name=trainer_name, routine_c_form=routine_c_form, member_p_form=member_p_form, room_occupancy=room_occupancy)
 
@@ -188,8 +191,8 @@ def session_edit(session_id):
 
     # Get Routine data to show in the view
     sess = db.session # https://flask-sqlalchemy.palletsprojects.com/en/3.0.x/quickstart/#query-the-data
-    query_result = sess.query(Routine, SessionRoutine).join(SessionRoutine).filter(SessionRoutine.session_id == session_id) # https://stackoverflow.com/questions/6044309/sqlalchemy-how-to-join-several-tables-by-one-query
-    routines_data = [{'routine_id': routine.routine_id, 'routine_name': routine.name, 'routine_count': session_routine.routine_count} for routine, session_routine in query_result] # Mapping elements of the query_result array to get an array of objects 
+    query_result = Routine.query.all() 
+    routines_data = [{'routine_id': routine.routine_id, 'routine_name': routine.name, 'routine_count': 0} for routine in query_result] # Mapping elements of the query_result array to get an array of objects 
     # routines_data is an array of dictionaries of the form: [
     #     {'routine_id': 2, 'routine_name': 'pushups', 'routine_count': 3},
     #     {'routine_id': 4, 'routine_name': 'situps', 'routine_count': 5},
@@ -201,28 +204,21 @@ def session_edit(session_id):
     # Get Room data to show in the View
     room_capacity = Room.query.get(session.room_id).capacity if session.room_id is not None else None # Get room_capacity if a Room exists for this session, otherwise room_capacity = None
 
+    members_data = None
     if is_member:
         # Attempt to get current MemberSession, check if it exists
-        query_result = sess.query(Member, MemberSession).outerjoin(MemberSession).filter(MemberSession.session_id == session_id, MemberSession.member_id == current_user.member_id)
-    else:
-        # Get Member data to show in the View
-        query_1 = sess.query(Member, MemberSession).outerjoin(MemberSession).filter(MemberSession.session_id == session_id)
-        query_2 = sess.query(Member, MemberSession).outerjoin(MemberSession).filter(or_(MemberSession.session_id != session_id, MemberSession.session_id == None)).distinct(Member.member_id)
-        query_result = query_1.union(query_2).distinct(Member.member_id).all()
-        # Get Members left joined on MemberSession, but include only records with EITHER the current session OR NO session. Then get data of Members in this session to populate the view.
-        # query_result_1 = sess.query(Member, MemberSession).outerjoin(MemberSession).filter(or_(MemberSession.session_id == session_id, MemberSession.session_id == None))
-        # Get Members left joined on MemberSession, but include only 1 record with involving session
-        # query_result_2 = sess.query(Member, MemberSession).outerjoin(MemberSession).filter(MemberSession.session_id != session_id).distinct(MemberSession.member_id)
-        print(query_1.all())
-        print(query_2.all())
+        query_result = sess.query(Member, MemberSession).outerjoin(MemberSession).filter(MemberSession.session_id == session_id, MemberSession.member_id == current_user.member_id).all()
         print(query_result)
-    members_data = [{'member_id': member.member_id, 'member_name': f'{member.first_name} {member.last_name}', 'add_to_session': ('Yes' if member_session.session_id == session_id else 'No') if member_session else 'No'} for member, member_session in query_result] # If a MemberSession already exists for the MemberSession, display.
-    print(members_data)
+        members_data = [{'member_id': member.member_id, 'member_name': f'{member.first_name} {member.last_name}', 'add_to_session': 'No' } for member, member_session in query_result]
+        print(members_data)
+    else:
+        # Show all Members in the View
+        query_result = Member.query.all()
+        members_data = [{'member_id': member.member_id, 'member_name': f'{member.first_name} {member.last_name}', 'add_to_session': 'No' } for member in query_result]
+
     # Count how many slots currently filled 
-    room_slots_filled = sum(1 for member in members_data if (lambda member: member['add_to_session'] == 'Yes'(member)))
+    room_slots_filled = MemberSession.query.filter(MemberSession.session_id == session_id).count()
     room_occupancy = f'{room_slots_filled}/{room_capacity}' if session.room_id else 'No room booked' # Reports the room occupancy e.g. 17/20
-    if current_user.role == 'Member': # If current user is a member, we don't wanna show ANY members_data
-        members_data = None
 
     # Find the Trainer associated with the session_id
     trainer = Trainer.query.get_or_404(session.trainer_id)
@@ -235,15 +231,18 @@ def session_edit(session_id):
 
 
     # Here, defining dropdown choices is necessary to show a dropdown for Trainers in the view, as opposed to forcing them to manually enter a trainer_id. Same for Rooms.
+    form.is_group_booking.data = 'Yes' if session.is_group_booking else 'No'
+    form.pricing.data = session.pricing
     form.trainer_id.choices = [(trainer.trainer_id, trainer.first_name + " " + trainer.last_name) for trainer in Trainer.query.all()]
     form.room_id.choices = [(room.room_id, room.name) for room in Room.query.all()]
     form.room_id.choices.insert(0, (-1, 'None')) # Create a dummy room option with room_id = -1 and name = 'None'. Insert at index 0
-    
+    if is_member:
+        form.room_id.data = session.room_id
+    print(form.room_id.choices)
     # Need to prevent changing room_id from something to None if there's already a Member? I think no need.
     
     # This code runs if form validation is successful
     if form.validate_on_submit():
-        print("hello0")
         # First, update the Session in the db
         session.name=form.name.data
         session.start_time=form.start_time.data
@@ -251,7 +250,6 @@ def session_edit(session_id):
         session.trainer_id=form.trainer_id.data
         room_id_to_add = None if form.room_id.data < 0 else form.room_id.data
         session.room_id = room_id_to_add
-        print("hello1")
 
         # Second, add, update or delete SessionRoutines in the db
         for routine in form.routines.data: # each routine looks like {'routine_id': 1, 'routine_name': 'Push Ups', 'routine_count': 1, 'csrf_token': 'ImMxNmQ2MGU3ZDM2YTI3M2I5MjBhN2VhN2Y5ZjZhZGJkMjJmZDBlNzIi.ZgHW-w.LmqbvzQt7c1R2Xzjnj2Aq1T-PCE'}
@@ -266,7 +264,7 @@ def session_edit(session_id):
                 if routine['routine_count'] > 0: # Add
                     session_routine = SessionRoutine(session_id=session_id, routine_id=routine['routine_id'], routine_count=routine['routine_count'])
                     db.session.add(session_routine)
-        print("hello2")
+
         # Third, add or remove or do nothing with each MemberSession from the db, based on 'add_to_session'. We never update MemberSessions, because can't change has_paid_for. I assume the form stops a Member from updating other Members' data!!
         for member in form.members.data: # each member probs looks sth like {'member_id': 1, 'add_to_session': 'No'}
             # If MemberSession already exists, we delete it or do nothing:
