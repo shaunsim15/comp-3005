@@ -36,9 +36,10 @@ def sessions():
 def session_show(session_id):  # Get the session_id used in the GET request URL
     # Find the Session associated with the session_id
     session = Session.query.get_or_404(session_id)
+    is_member = current_user.role == 'Member'
 
     # If logged in as Member
-    if current_user.role == 'Member': 
+    if is_member: 
         # If the Session to be shown is not a Group session, and is not a Personal Session associated with the Member, don't show the page
         if (not session.is_group_booking) and (MemberSession.query.filter_by(member_id=current_user.member_id, session_id=session_id).first() == None):
             abort(404)
@@ -67,7 +68,10 @@ def session_show(session_id):  # Get the session_id used in the GET request URL
     room_slots_filled = len(members_data)
     room_occupancy = f'{room_slots_filled}/{room_capacity}' if session.room_id else 'No room booked' # Reports the room occupancy e.g. 17/20
     if current_user.role == 'Member': # If current user is a member, we don't wanna show ANY members_data
-        members_data = None 
+        # Attempt to get current MemberSession, check if it exists
+        query_result = sess.query(Member, MemberSession).join(MemberSession).filter(MemberSession.session_id == session_id, MemberSession.member_id == current_user.member_id).all()
+        members_data = [{'member_id': member.member_id, 'member_name': f'{member.first_name} {member.last_name}', 'has_paid_for': 'Yes' if member_session.has_paid_for else 'No'} for member, member_session in query_result]
+        print(members_data)
 
     form = SessionForm(routines=routines_data, members=members_data) # Populate the routines FieldList with initial data, and the members FieldList with initial data 
     routine_c_form = RoutineCountForm() # Initializes a form, similar to SessionForm. I'm only doing this to get the label, not super important
@@ -76,7 +80,7 @@ def session_show(session_id):  # Get the session_id used in the GET request URL
     form.room_id.choices = [(room.room_id, room.name) for room in Room.query.all()]
     form.room_id.choices.insert(0, (-1, 'None')) # Create a dummy room option with room_id = -1 and name = 'None'. Insert at index 0
     # Display the show view
-    return render_template("session/show.html", session=session, form=form, trainer_name=trainer_name, routine_c_form=routine_c_form, member_p_form=member_p_form, room_occupancy=room_occupancy)
+    return render_template("session/show.html", session=session, form=form, trainer_name=trainer_name, routine_c_form=routine_c_form, member_p_form=member_p_form, room_occupancy=room_occupancy, is_member=is_member)
 
 # NEW ROUTE
 @session.route("/new", methods=['GET', 'POST'])
@@ -206,11 +210,8 @@ def session_edit(session_id):
 
     members_data = None
     if is_member:
-        # Attempt to get current MemberSession, check if it exists
-        query_result = sess.query(Member, MemberSession).outerjoin(MemberSession).filter(MemberSession.session_id == session_id, MemberSession.member_id == current_user.member_id).all()
-        print(query_result)
-        members_data = [{'member_id': member.member_id, 'member_name': f'{member.first_name} {member.last_name}', 'add_to_session': 'No' } for member, member_session in query_result]
-        print(members_data)
+        # Show one entry, to allow the member to join or exit the session.
+        members_data = [{'member_id': current_user.member_id, 'member_name': f'{current_user.first_name} {current_user.last_name}', 'add_to_session': 'No' } ]
     else:
         # Show all Members in the View
         query_result = Member.query.all()
@@ -237,12 +238,13 @@ def session_edit(session_id):
     form.room_id.choices = [(room.room_id, room.name) for room in Room.query.all()]
     form.room_id.choices.insert(0, (-1, 'None')) # Create a dummy room option with room_id = -1 and name = 'None'. Insert at index 0
     if is_member:
-        form.room_id.data = session.room_id
+        form.room_id.data = -1 if session.room_id is None else session.room_id
     print(form.room_id.choices)
     # Need to prevent changing room_id from something to None if there's already a Member? I think no need.
     
     # This code runs if form validation is successful
     if form.validate_on_submit():
+        print("submit validaiton done")
         # First, update the Session in the db
         session.name=form.name.data
         session.start_time=form.start_time.data
@@ -310,6 +312,8 @@ def delete_session(session_id):
     # To add: some way of checking this Member is authorized to delete this Session
     # if session.author != current_user:
     #     abort(403)
+
+    # DO not leave deletion to the cascade- it will delete has_paid_for=True records.
 
     # Delete the Session 
     db.session.delete(session)

@@ -40,7 +40,7 @@
         </select> 
     </div>
     <div class="form-group">
-        Room Occupancy
+        Room Occupancy (excluding the trainer)
         <p>{{ room_occupancy }}</p>
     </div>
     {% if form.routines %}
@@ -67,6 +67,7 @@
             </table>
         </div>
     {% endif %}
+    <!-- If there is data, show it -->
     {% if form.members %}
         <div class="form-group">
             <div> {{form.members.label}}</div>
@@ -90,6 +91,9 @@
                 </tbody>
             </table>
         </div>
+    <!-- If there is no data, AND you're a Member, report that you're not enrolled in the Session -->
+    {% elif is_member %}
+        <div>You are not yet enrolled in this Group Session. Click 'Edit Session' to enroll yourself.</div>
     {% endif %}
     <a class="btn btn-primary py-3" href="{{ session.session_id ~ '/edit' }}" role="button">Edit Session</a>
     <form class="py-3" method="POST" action="{{session.session_id ~ '/delete'}}">
