@@ -194,7 +194,8 @@ INSERT INTO room (name, capacity)
 VALUES
 ('Cardio Room', 20),
 ('Weightlifting Area', 15),
-('Exercise Studio', 30);
+('Exercise Studio', 30),
+('Tiny Room', 2);
 
 INSERT INTO trainer (first_name, last_name, email, password)
 VALUES

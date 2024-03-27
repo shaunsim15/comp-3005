@@ -63,7 +63,7 @@ def session_show(session_id):  # Get the session_id used in the GET request URL
     
     # Get Member data to show in the View
     query_result = sess.query(Member, MemberSession).join(MemberSession).filter(MemberSession.session_id == session_id)
-    members_data = [{'member_id': member.member_id, 'member_name': f'{member.first_name} {member.last_name}', 'has_paid_for': member_session.has_paid_for} for member, member_session in query_result]
+    members_data = [{'member_id': member.member_id, 'member_name': f'{member.first_name} {member.last_name}', 'has_paid_for': 'Yes' if member_session.has_paid_for else 'No'} for member, member_session in query_result]
     room_slots_filled = len(members_data)
     room_occupancy = f'{room_slots_filled}/{room_capacity}' if session.room_id else 'No room booked' # Reports the room occupancy e.g. 17/20
     if current_user.role == 'Member': # If current user is a member, we don't wanna show ANY members_data
@@ -94,7 +94,7 @@ def session_new():
     # where each dictionary represents a Routine in the Routines table. We list ALL Routines.
     # routines_data is used to populate each FormField (i.e. each RoutineCountForm) of the routines FieldList with initial data, as shown here: https://stackoverflow.com/questions/28375565/add-input-fields-dynamically-with-wtforms
     query_result = Member.query.all()
-    members_data = [{'member_id': member.member_id, 'member_name': f'{member.first_name} {member.last_name}', 'add_to_session': False} for member in query_result]
+    members_data = [{'member_id': member.member_id, 'member_name': f'{member.first_name} {member.last_name}', 'add_to_session': 'No'} for member in query_result]
     
     form = SessionForm(routines=routines_data, members=members_data)
     
@@ -129,7 +129,7 @@ def session_new():
         else:
             # First, add a Session to the db
             room_id_to_add = None if form.room_id.data < 0 else form.room_id.data
-            is_group_booking_to_add = form.is_group_booking.data == 'True'
+            is_group_booking_to_add = form.is_group_booking.data == 'Yes'
             sesh = Session(name=form.name.data, start_time=form.start_time.data, end_time=form.end_time.data, trainer_id=form.trainer_id.data, is_group_booking=is_group_booking_to_add, pricing=form.pricing.data, room_id=room_id_to_add) # Create a Session using data from form. For security reasons, I am specifying separate values for is_group_booking, pricing & room_id even though they have default values in session_forms.py
             db.session.add(sesh)
             db.session.flush() # Flush to get primary keys, so sesh.session_id works
@@ -140,9 +140,20 @@ def session_new():
                     session_routine = SessionRoutine(session_id=sesh.session_id, routine_id=routine['routine_id'], routine_count=routine['routine_count'])
                     db.session.add(session_routine) # Fine to add directly, since this is NEW route, no conflicting existing records
             
-            # Third, add MemberSessions to the db (only one, since Members can only create Personal sessions involving themselves)
-            for member in form.members.data: # each member probs looks sth like {'member_id': 1, 'add_to_session': False}
-                if member['add_to_session'] == 'True':
+            # Third, add MemberSessions to the db
+            member_count = 0
+            for member in form.members.data: # each member probs looks sth like {'member_id': 1, 'add_to_session': 'No'}
+                if member['add_to_session'] == 'Yes': # If this member is supposed to be added to the session
+                    # For personal bookings, this block checks that no more than 1 member can be added to the Session
+                    if not is_group_booking_to_add:
+                        member_count += 1
+                        if member_count > 1:
+                            db.session.rollback()
+                            flash('Error: Cannot add more than one member to a Personal Session', 'danger')
+                            db.session.close()
+                            return redirect(url_for("session.sessions"))
+                    
+                    # Adds the member to the session
                     member_session = MemberSession(member_id=member['member_id'], session_id=sesh.session_id, has_paid_for=False)
                     db.session.add(member_session) # Fine to add directly, since this is NEW route, no conflicting existing records
         
@@ -165,7 +176,7 @@ def session_new():
 def session_edit(session_id):
     # Only allow session editing if current user is a Member
     if current_user.role != 'Member': 
-        return redirect(url_for("users.login")) 
+        return redirect(url_for("home.index")) 
     
     # To add: logic that prevents a member from editing a personal session that's not theirs
 
@@ -203,7 +214,7 @@ def session_edit(session_id):
 def delete_session(session_id):
     # Only allow Session deletion if current user is a Member
     if current_user.role != 'Member': 
-        return redirect(url_for("users.login")) 
+        return redirect(url_for("home.index")) 
     
     # Check that session exists!
     session = Session.query.get_or_404(session_id)
