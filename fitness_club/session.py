@@ -302,32 +302,31 @@ def session_edit(session_id):
 @session.route("<int:session_id>/delete", methods=['POST'])
 @login_required
 def delete_session(session_id):
-    # Only allow Session deletion if current user is a Member
-    if current_user.role != 'Member': 
-        return redirect(url_for("home.index")) 
-    
     # Check that session exists!
     session = Session.query.get_or_404(session_id)
 
-    # To add: some way of checking this Member is authorized to delete this Session
-    # if session.author != current_user:
-    #     abort(403)
+    # Define whether current_user is Member
+    is_member = current_user.role == 'Member'
 
-    # DO not leave deletion to the cascade- it will delete has_paid_for=True records.
+    # If logged in as Member
+    if is_member: 
+        # If the Session to be shown is a Group session OR is not a Personal Session associated with the Member, don't allow deletion
+        if (session.is_group_booking):
+            flash('Error: Members cannot delete Group Sessions', 'danger')
+            return redirect(url_for("session.session_show", session_id=session_id))
+        elif MemberSession.query.filter_by(member_id=current_user.member_id, session_id=session_id).first() == None:
+            flash('Error: Members cannot delete Personal Sessions that do not involve them', 'danger')
+            return redirect(url_for("session.session_show", session_id=session_id))
+    
+    # Ensure no one has paid for the session yet
+    member_sessions = MemberSession.query.filter_by(session_id=session_id).all()
+    for mem_sesh in member_sessions:
+        if mem_sesh.has_paid_for:
+            flash('Error: Cannot delete a Session where at least one member has paid', 'danger')
+            return redirect(url_for("session.session_show", session_id=session_id))      
 
-    # Delete the Session 
+    # Delete the Session. The cascade in the db should delete all MemberSessions and SessionRoutines
     db.session.delete(session)
     db.session.commit()
     flash('Your session has been deleted!', 'success')
     return redirect(url_for('session.sessions'))
-
-# UNUSED SHOW ROUTE CODE:
-    # routines = Routine.query.join(Routine.sessions).filter(
-    #     Routine.sessions.any(session_id=session_id)
-    # ).all() # This gives an array of Routines associated with the session_id, not quite what we want: [<Routine 1>, <Routine 2>, <Routine 3>, <Routine 4>, <Routine 5>]
-
-    # session_routines = SessionRoutine.query.join(Routine).filter(
-    #     SessionRoutine.session_id == session_id
-    # ).all() # This gives an array of SessionRoutines associated with the session_id, not quite what we want: [<SessionRoutine 1, 1>, <SessionRoutine 1, 2>, <SessionRoutine 1, 3>, <SessionRoutine 1, 4>, <SessionRoutine 1, 5>]
-
-# [member for member in members_data if member['member_id'] == current_user.member_id] # members_data may be an empty array if no match found

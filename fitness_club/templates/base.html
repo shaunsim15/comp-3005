@@ -38,6 +38,9 @@
           <li class="nav-item">
             <a class="nav-link" href="/dashboard">Dashboard</a>
           </li>
+          <li class="nav-item">
+            <a class="nav-link" href="/billing">Billing</a>
+          </li>
           {% endif %}
           {% if current_user.role == 'Trainer' %}
           <li class="nav-item">
@@ -52,6 +55,9 @@
           </li>
           <li class="nav-item">
             <a class="nav-link" href="/room">Room</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="/billing">Billing</a>
           </li>
           {% endif %}
         {% else %}
