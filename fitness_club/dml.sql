@@ -1,142 +1,3 @@
-DROP TABLE IF EXISTS "admin";
-DROP TABLE IF EXISTS equipment;
-DROP TABLE IF EXISTS schedule;
-DROP TABLE IF EXISTS session_routine;
-DROP TABLE IF EXISTS routine;
-DROP TABLE IF EXISTS member_session;
-DROP TABLE IF EXISTS "session";
-DROP TABLE IF EXISTS trainer;
-DROP TABLE IF EXISTS room;
-DROP TABLE IF EXISTS member_achievement;
-DROP TABLE IF EXISTS achievement;
-DROP TABLE IF EXISTS weight_log;
-DROP TABLE IF EXISTS member;
-
-
-
-CREATE TABLE member (
-    member_id SERIAL PRIMARY KEY,   
-    first_name VARCHAR(20),
-    last_name VARCHAR(20),
-    email VARCHAR(50) UNIQUE NOT NULL,
-    password VARCHAR(255) NOT NULL,
-    goal_weight NUMERIC(5,2),
-    goal_date DATE,
-    height NUMERIC(5,2)
-);
-
-CREATE TABLE weight_log(
-    weight NUMERIC(5,2),
-    date DATE,
-    member_id INT,
-    PRIMARY KEY (member_id, date),
-    FOREIGN KEY (member_id) REFERENCES member
-        ON DELETE CASCADE
-);
-
-CREATE TABLE achievement(
-    achievement_id SERIAL PRIMARY KEY,
-    name VARCHAR(20)
-);
-
-CREATE TABLE member_achievement(
-    member_id INT,
-    achievement_id INT,
-    date DATE,
-    PRIMARY KEY (member_id, achievement_id),
-    FOREIGN KEY (member_id) REFERENCES member
-        ON DELETE SET NULL,
-    FOREIGN KEY (achievement_id) REFERENCES achievement
-        ON DELETE SET NULL
-);
-
-CREATE TABLE room(
-    room_id SERIAL PRIMARY KEY,
-    name VARCHAR(20),
-    capacity INT
-);
-
-
-CREATE TABLE trainer(
-    trainer_id SERIAL PRIMARY KEY,
-    first_name VARCHAR(20),
-    last_name VARCHAR(20),
-    email VARCHAR(50) UNIQUE NOT NULL,
-    password VARCHAR(255) NOT NULL
-);
-
-CREATE TABLE session(
-    session_id SERIAL PRIMARY KEY,
-    name VARCHAR(20),
-    start_time TIMESTAMP,
-    end_time TIMESTAMP,
-    is_group_booking BOOLEAN,
-    pricing NUMERIC(8,2) CHECK (pricing > 0),
-    room_id INT,
-    trainer_id INT,
-    FOREIGN KEY (room_id) REFERENCES room
-        ON DELETE SET NULL,
-    FOREIGN KEY (trainer_id) REFERENCES trainer
-        ON DELETE SET NULL
-);
-
-
-
-CREATE TABLE member_session(
-    member_id INT,
-    session_id INT,
-    has_paid_for BOOLEAN,
-    PRIMARY KEY (member_id, session_id),
-    FOREIGN KEY (member_id) REFERENCES member
-        ON DELETE CASCADE,
-    FOREIGN KEY (session_id) REFERENCES session
-        ON DELETE CASCADE
-);
-
-CREATE TABLE routine(
-    routine_id SERIAL PRIMARY KEY,
-    name VARCHAR(20),
-    calories_burnt INT
-);
-
-CREATE TABLE session_routine(
-    session_id INT,
-    routine_id INT,
-    routine_count INT,
-    PRIMARY KEY (session_id, routine_id),
-    FOREIGN KEY (session_id) REFERENCES session
-        ON DELETE CASCADE,
-    FOREIGN KEY (routine_id) REFERENCES routine
-        ON DELETE CASCADE
-);
-
-CREATE TABLE schedule(
-    trainer_id INT,
-    start_time TIMESTAMP,
-    end_time TIMESTAMP,
-    PRIMARY KEY (trainer_id, start_time),
-    FOREIGN KEY (trainer_id) REFERENCES trainer
-        ON DELETE CASCADE
-);
-
-CREATE TABLE equipment(
-    equipment_id SERIAL PRIMARY KEY,
-    name VARCHAR(20),
-    last_maintained_date DATE,
-    days_in_maintenance_interval INT,
-    room_id INT,
-    FOREIGN KEY (room_id) REFERENCES room
-        ON DELETE SET NULL
-);
-
-CREATE TABLE admin(
-    admin_id SERIAL PRIMARY KEY,
-    email VARCHAR(50) UNIQUE NOT NULL,
-    password VARCHAR(255) NOT NULL,
-    first_name VARCHAR(20),
-    last_name VARCHAR(20)
-);
-
 INSERT INTO member (first_name, last_name, email, password, goal_weight, goal_date, height)
 VALUES
 ('John', 'Doe', 'johndoe@gmail.com', '$2b$12$HKOaYFobfQYbRyaMvLVcweG38Y1s3X/Rcr3bIZbvuyDLSSAIuWmAS', 70.5, '2024-06-01', 175), -- 'password123'
@@ -169,26 +30,27 @@ VALUES
 
 INSERT INTO achievement (name)
 VALUES
-('1st Session Booked'),
-('10 Sessions Booked'),
-('25 Sessions Booked');
+('1st Session Paid For'),
+('5 Sessions Paid For'),
+('10 Sessions Paid For');
 
-INSERT INTO member_achievement (member_id, achievement_id, date)
-VALUES
-(1, 2, '2024-03-10'),
-(1, 1, '2024-03-05'),
-(3, 3, '2024-03-20'),
-(4, 1, '2024-03-12'),
-(5, 2, '2024-03-18'),
-(6, 1, '2024-03-25'),
-(2, 2, '2024-03-12'),
-(3, 1, '2024-03-10'),
-(4, 2, '2024-03-18'),
-(5, 3, '2024-03-22'),
-(7, 1, '2024-03-25'),
-(8, 2, '2024-03-27'),
-(9, 1, '2024-03-20'),
-(10, 2, '2024-03-29');
+-- I'm commenting this out because this data isn't actually consistent with what sessions have been created / paid for. Let the trigger handle that logic
+-- INSERT INTO member_achievement (member_id, achievement_id, date)
+-- VALUES
+-- (1, 2, '2024-03-10'),
+-- (1, 1, '2024-03-05'),
+-- (3, 3, '2024-03-20'),
+-- (4, 1, '2024-03-12'),
+-- (5, 2, '2024-03-18'),
+-- (6, 1, '2024-03-25'),
+-- (2, 2, '2024-03-12'),
+-- (3, 1, '2024-03-10'),
+-- (4, 2, '2024-03-18'),
+-- (5, 3, '2024-03-22'),
+-- (7, 1, '2024-03-25'),
+-- (8, 2, '2024-03-27'),
+-- (9, 1, '2024-03-20'),
+-- (10, 2, '2024-03-29');
 
 INSERT INTO room (name, capacity)
 VALUES
@@ -220,16 +82,27 @@ VALUES
 ('Session 7', '2024-03-16 18:00:00', '2024-03-16 19:00:00', false, 20.00, 2, 2);
 
 
-
+-- IF you change this data, please change the UPDATE statement below
 INSERT INTO member_session (member_id, session_id, has_paid_for)
 VALUES
 (1, 1, true),
-(1, 2, true),
 (1, 3, false),
 (1, 4, false),
 (1, 7, false),
 (2, 2, true),
 (3, 3, false);
+
+-- These dummy updates are just to cause the trigger to fire, since it doesn't fire on inserts; only on updates
+-- Update each record where has_paid_for = true to .... has_paid_for = true. Can't make the condition "WHERE has_paid_for = true;" because this would do bulk update, not row by row
+UPDATE member_session
+SET has_paid_for = true
+WHERE has_paid_for = true;
+
+-- UPDATE member_session
+-- SET has_paid_for = true
+-- WHERE (member_id = 1 AND session_id = 1)
+-- OR (member_id = 1 AND session_id = 2)
+-- OR (member_id = 2 AND session_id = 2);
 
 
 INSERT INTO routine (name, calories_burnt)
