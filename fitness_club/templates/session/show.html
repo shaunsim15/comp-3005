@@ -31,9 +31,7 @@
     </div>
     <div class="form-group">
         {{ form.room_id.label }}
-        <select class="form-control" style="caret-color: transparent;" disabled readonly>
-            <option selected>{{ session.room_id }}</option>
-        </select> 
+        {{ form.room_id(class="form-control", disabled=disabled, style="caret-color: transparent;") }}
     </div>
     <div class="form-group">
         {{ form.trainer_id.label }}
@@ -42,7 +40,7 @@
         </select> 
     </div>
     <div class="form-group">
-        Room Occupancy
+        Room Occupancy (excluding the trainer)
         <p>{{ room_occupancy }}</p>
     </div>
     {% if form.routines %}
@@ -69,7 +67,8 @@
             </table>
         </div>
     {% endif %}
-    {% if form.member_data %}
+    <!-- If there is data, show it -->
+    {% if form.members %}
         <div class="form-group">
             <div> {{form.members.label}}</div>
             <table class="table table-bordered">
@@ -92,6 +91,9 @@
                 </tbody>
             </table>
         </div>
+    <!-- If there is no data, AND you're a Member, report that you're not enrolled in the Session -->
+    {% elif is_member %}
+        <div>You are not yet enrolled in this Group Session. Click 'Edit Session' to enroll yourself.</div>
     {% endif %}
     <a class="btn btn-primary py-3" href="{{ session.session_id ~ '/edit' }}" role="button">Edit Session</a>
     <form class="py-3" method="POST" action="{{session.session_id ~ '/delete'}}">

@@ -25,6 +25,9 @@
         <li class="nav-item active">
           <a class="nav-link" href="/logout">Log Out  </a>
         </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/session">Session</a>
+        </li>
          {% if current_user.role == 'Member' %}
           <li class="nav-item">
             <a class="nav-link" href="/member-goals">Goals</a>
@@ -33,10 +36,10 @@
             <a class="nav-link" href="/log-weight">Health Metrics</a>
           </li>
           <li class="nav-item">
-            <a class="nav-link" href="/session">Session</a>
+            <a class="nav-link" href="/dashboard">Dashboard</a>
           </li>
           <li class="nav-item">
-            <a class="nav-link" href="/dashboard">Dashboard</a>
+            <a class="nav-link" href="/billing">Billing</a>
           </li>
           {% endif %}
           {% if current_user.role == 'Trainer' %}
@@ -52,6 +55,9 @@
           </li>
           <li class="nav-item">
             <a class="nav-link" href="/room">Room</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="/billing">Billing</a>
           </li>
           {% endif %}
         {% else %}

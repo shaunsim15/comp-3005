@@ -32,9 +32,11 @@
         </div>
         <div class="form-group">
             {{ form.room_id.label }}
-            <select class="form-control" style="caret-color: transparent;" disabled readonly>
-                <option selected>{{ session.room_id }}</option>
-            </select> 
+            {% if is_member %}
+                {{ form.room_id(class="form-control", disabled=disabled, style="caret-color: transparent;") }}
+            {% else %}
+                {{ form.room_id(class="form-control") }}    
+            {% endif %}
         </div>
         <div class="form-group">
             {{ form.trainer_id.label }}
@@ -44,6 +46,61 @@
                     <option value="{{ value }}" {% if selected %}selected{% endif %}>{{ label }}</option>
                 {% endfor %}
             </select>
+        </div>
+        <div class="form-group">
+            Room Occupancy (excluding the trainer)
+            <p>{{ room_occupancy }}</p>
+        </div>
+        <div class="form-group">
+            <div> {{form.routines.label}}</div>
+            {% if is_member and session.is_group_booking %}
+                Members are not allowed to change Routines for Group Sessions- the Trainer/Admin decides these. 
+            {% else %}
+                <table class="table table-bordered">
+                    <thead class="thead-dark">
+                        <tr>
+                            <th>{{ routine_c_form.routine_id.label }}</th>
+                            <th>{{ routine_c_form.routine_name.label }}</th>
+                            <th>{{ routine_c_form.routine_count.label }}</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for routine_count_form in form.routines %}
+                            {{ routine_count_form.hidden_tag() }}
+                            <tr>
+                                <td>{{ routine_count_form.routine_id(class="form-control", disabled=disabled, style="caret-color: transparent;") }}</td>
+                                <td>{{ routine_count_form.routine_name(class="form-control", disabled=disabled, style="caret-color: transparent;") }}</td>
+                                <td>{{ routine_count_form.routine_count(class="form-control") }}</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            {% endif %}
+        </div>
+        <div class="form-group">
+            <div> {{form.members.label}}</div>
+            <table class="table table-bordered">
+                <thead class="thead-dark">
+                    <tr>
+                        <th>{{ member_p_form.member_id.label }}</th>
+                        <th>{{ member_p_form.member_name.label }}</th>
+                        <th>{{ member_p_form.add_to_session.label }}</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for member_paid_form in form.members %}
+                        {{ member_paid_form.hidden_tag() }}
+                        <tr>
+                            <td>{{ member_paid_form.member_id(class="form-control", disabled=true, style="caret-color: transparent;") }}</td>
+                            <td>{{ member_paid_form.member_name(class="form-control", disabled=true, style="caret-color: transparent;") }}</td>
+                            <td>{{ member_paid_form.add_to_session(class="form-control") }}</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            {% if is_member and not session.is_group_booking %}
+                <div>Warning- unenrolling yourself from a Personal Session will cause it to disappear from view. You will need to ask a Trainer/Admin to add you back.</div>
+            {% endif %}
         </div>
         <div class="form-group">
             <input class="btn btn-primary" id="submit" name="submit" type="submit" value="Update">
