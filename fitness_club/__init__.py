@@ -63,7 +63,7 @@ def create_app():
     app.register_blueprint(users, url_prefix='/')
     app.register_blueprint(dashboard, url_prefix='/')
     app.register_blueprint(home, url_prefix='/')
-    app.register_blueprint(health_metrics)
+    app.register_blueprint(health_metrics, url_prefix = '/health-metrics')
     app.register_blueprint(goal_setting_bp)
     app.register_blueprint(equipment, url_prefix='/equipment')
     app.register_blueprint(schedule, url_prefix='/schedule')

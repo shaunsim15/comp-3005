@@ -1,21 +1,172 @@
 {% extends "base.html" %}
-{% block title %}Health Metrics{% endblock %}
+{% block title %}Health Metrics Dashboard{% endblock %}
 {% block content %}
+<div class="row">
+    <div class="col-md-6">
+        <h3 class="display-4 py-3 mx-auto">Health Metrics</h3>
+        <canvas id="weightChart" width="800" height="400"></canvas>
 
-<h1 align="center">Health Metrics</h1>
-<form method="POST">
-  {{ log_weight_form.hidden_tag() }}
-  <div class="form-group">
-    {{ log_weight_form.weight.label }}
-    {{ log_weight_form.weight(class="form-control") }}
-  </div>
-  <div class="form-group">
-    {{ log_weight_form.date.label }}
-    {{ log_weight_form.date(class="form-control") }}
-  </div>
-  <div class="form-group">
-    <button type="submit" class="btn btn-primary">Submit</button>
-  </div>
-</form>
+        <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+        <script>
+            // Line chart data
+            var dates = JSON.parse('{{ dates|tojson|safe }}');
+            var weights = JSON.parse('{{ weights|tojson|safe }}');
+            
+            // Get goal weight and goal date
+            var goalWeight = '{{ goal_weight }}';
+            var goalDate = '{{ goal_date }}';
+            
+            // Format goal date string
+            if (goalDate) {
+                goalDate = new Date(goalDate.replace(/-/g, '/'));
+                goalDate = goalDate.toISOString().slice(0, 10);
+            }
+            
+            // Add goal date and goal weight to the arrays
+            if (goalWeight && goalDate) {
+                dates.push(goalDate);
+                weights.push(goalWeight);
+            }
+            
+            // Get today's date
+            var today = new Date().toISOString().slice(0, 10);
+            
+            
+            // Create an array of objects to hold both date and weight information
+            var dataPoints = dates.map(function(date, index) {
+                return {
+                    date: date,
+                    weight: weights[index]
+                };
+            });
+            
+            // Sort dataPoints array based on dates
+            dataPoints.sort(function(a, b) {
+                return new Date(a.date) - new Date(b.date);
+            });
+            
+            // Update dates and weights arrays from sorted dataPoints array
+            dates = dataPoints.map(function(dataPoint) {
+                return dataPoint.date;
+            });
 
+            weights = dataPoints.map(function(dataPoint) {
+                return dataPoint.weight;
+            });
+            
+            // Create datasets array
+            var datasets = [{
+                data: weights,
+                label: "Weight",
+                borderColor: "#3e95cd",
+                fill: false
+            }];
+            
+            // Check if goal weight and goal date are defined
+            if (goalWeight && goalDate) {
+                // Find the index of the goal date
+                var goalIndex = dates.indexOf(goalDate);
+                if (goalIndex !== -1) {
+                    // Update the color of the point corresponding to the goal
+                    datasets[0].pointBackgroundColor = datasets[0].data.map((date, index) => index === goalIndex ? 'red' : 'blue');
+                    // Add legend information for goal weight
+                    datasets.push({
+                        label: "Goal Weight",
+                        borderColor: "red",
+                        backgroundColor: "red",
+                        pointRadius: 5,
+                        pointHoverRadius: 8,
+                        fill: false
+                    });
+                }
+            }
+            
+            // Line chart
+            new Chart(document.getElementById("weightChart"), {
+                type: 'line',
+                data: {
+                    labels: dates.map(date => {
+                        var tempDate = new Date(date.replace(/-/g, '/'));
+                        if (date !== goalDate) {
+                            tempDate.setDate(tempDate.getDate() + 1); // Add a day
+                        }
+                        return tempDate.toLocaleDateString('en-US');
+                    }), 
+                    // Format dates consistently
+                    datasets: datasets
+                },
+                options: {
+                    title: {
+                        display: true,
+                        text: 'Weight Tracking'
+                    },
+                    hover: {
+                        mode: 'index',
+                        intersect: true
+                    },
+                    scales: {
+                        yAxes: [{
+                            scaleLabel: {
+                                display: true,
+                                labelString: 'Weight (kg)'
+                            }
+                        }],
+                        xAxes: [{
+                            type: 'time',
+                            time: {
+                                unit: 'day',
+                                tooltipFormat: 'DD MMM YYYY',
+                                displayFormats: {
+                                    day: 'DD MMM YYYY'
+                                }
+                            },
+                            scaleLabel: {
+                                display: true,
+                                labelString: 'Date'
+                            }
+                        }]
+                    }
+                }
+            });
+        </script>
+        
+        
+        
+        
+        
+        
+        
+        
+      
+    </div>
+    <div class="col-md-6">
+        <h3 class="display-4 py-3 mx-auto">Log Weight (kg)</h3>
+        <form method="POST">
+            {{ log_weight_form.hidden_tag() }}
+            <div class="form-group">
+                {{ log_weight_form.weight.label }}
+                {{ log_weight_form.weight(class="form-control") }}
+            </div>
+            <div class="form-group">
+                {{ log_weight_form.date.label }}
+                {{ log_weight_form.date(class="form-control") }}
+            </div>
+            <div class="form-group">
+                <button type="submit" class="btn btn-primary">Submit</button>
+            </div>
+        </form>
+        
+        <h3 class="display-4 py-3 mx-auto">Log Height</h3>
+        <form method="POST">
+            {{ height_form.hidden_tag() }}
+            <div class="form-group">
+                {{ height_form.height.label }}
+                {{ height_form.height(class="form-control") }}
+            </div>
+            <div class="form-group">
+                <button type="submit" class="btn btn-primary">Submit</button>
+            </div>
+        </form>
+    </div>
+</div>
 {% endblock %}
