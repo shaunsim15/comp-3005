@@ -4,7 +4,7 @@ from wtforms.validators import DataRequired
 
 
 class LogWeightForm(FlaskForm):
-    weight = DecimalField('Weight', validators=[DataRequired()])
+    weight = DecimalField('Weight (kg)', validators=[DataRequired()])
     date = DateField('Date', validators=[DataRequired()])
 
 

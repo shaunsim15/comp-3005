@@ -48,15 +48,16 @@ def index():
             if existing_weight_log:
                 # If a record exists, update the weight
                 existing_weight_log.weight = weight
-                flash("Weight updated successfully!", "success")
                 db.session.commit()
-            
+                flash("Weight updated successfully!", "success")
+                
             else:
                 # If no record exists, create a new record
                 new_weight_log = WeightLog(weight=weight, date=date, member_id=member.member_id)
                 db.session.add(new_weight_log)
-                flash("Weight logged successfully!", "success")
                 db.session.commit()
+                flash("Weight logged successfully!", "success")
+                
             return redirect(url_for("health_metrics.index"))
 
     height_form = HeightForm()
