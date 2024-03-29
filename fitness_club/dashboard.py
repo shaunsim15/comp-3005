@@ -14,8 +14,8 @@ def index():
     start_date = datetime.now() - timedelta(days=7)
 
     # Retrieve personnel sessions done by the current user in the past week
-    past_week_sessions = db.session.query(Session).join(MemberSession, Session.session_id == MemberSession.session_id).filter
-    (MemberSession.member_id == current_user.member_id).filter(Session.end_time >= start_date).filter(Session.end_time <= datetime.now()).filter(Session.is_group_booking == False).all()
+    past_week_sessions = db.session.query(Session).join(MemberSession, Session.session_id == MemberSession.session_id).filter(MemberSession.member_id == current_user.member_id).filter(
+        Session.end_time >= start_date).filter(Session.end_time <= datetime.now()).filter(Session.is_group_booking == False).all()
 
     # Retrieve routines done by the current user in the past week
     past_week_routines = db.session.query(Routine, db.func.sum(SessionRoutine.routine_count)).join(SessionRoutine, Routine.routine_id == SessionRoutine.routine_id).join(

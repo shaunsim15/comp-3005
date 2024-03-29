@@ -18,7 +18,7 @@ class Member(db.Model, UserMixin): # Member inherits from 2 classes. db.Model is
     height = db.Column(db.Numeric(5, 2))
 
     sessions = db.relationship('Session', secondary='member_session', backref='members')
-    achievements = relationship("Achievement", secondary="member_achievements", backref="members")
+    achievements = db.relationship('Achievement', secondary='member_achievement', backref='members')
 
     def __repr__(self): # Provides a stringificaiton of the member object, kinda like toString() in Java
         return f"Member('{self.first_name}', '{self.last_name}', '{self.email}')"
@@ -167,6 +167,8 @@ class MemberAchievement(db.Model):
     member_id = db.Column(db.Integer, db.ForeignKey('member.member_id'), primary_key=True)
     achievement_id = db.Column(db.Integer, db.ForeignKey('achievement.achievement_id'), primary_key=True)
     date = db.Column(db.Date)
+    member = db.relationship('Member', backref=db.backref('member_achievements'))
+    achievement = db.relationship('Achievement', backref=db.backref('member_achievements'))
 
     def __repr__(self):
         return f"MemberAchievement('{self.member_id}', '{self.achievement_id}', '{self.date}')"
