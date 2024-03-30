@@ -3,6 +3,62 @@
 {% block content %}
 
 <h1 align="center">Dashboard</h1>
-    <p> Welcome to the Fitness Club Dashboard</p>
+<p>Welcome to the Fitness Club Dashboard, {{ logged_user.first_name }}!</p>
+
+<h2>Most Recent Achievements</h2>
+<table class="table">
+  <thead>
+    <tr>
+      <th scope="col">Achievement</th>
+      <th scope="col">Date Achieved</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for member_achievement, achievement in recent_achievements %}
+    <tr>
+      <td>{{ achievement.name }}</td>
+      <td>{{ member_achievement.date }}</td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+
+<h2>Personnel Sessions Done in the Past Week</h2>
+<table class="table">
+  <thead>
+    <tr>
+      <th scope="col">Session Name</th>
+      <th scope="col">Start Time</th>
+      <th scope="col">End Time</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for session in past_week_sessions %}
+    <tr>
+      <td>{{ session.name }}</td>
+      <td>{{ session.start_time }}</td>
+      <td>{{ session.end_time }}</td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+
+<h2>Routines Done in the Past Week</h2>
+<table class="table">
+  <thead>
+    <tr>
+      <th scope="col">Routine Name</th>
+      <th scope="col">Routine Count</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for routine, routine_count in past_week_routines %}
+    <tr>
+      <td>{{ routine.name }}</td>
+      <td>{{ routine_count }}</td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
 
 {% endblock %}
