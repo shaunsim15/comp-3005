@@ -1,8 +1,7 @@
 {% extends "base.html" %}
-{% block title %}Edit Schedule{% endblock % }
 {% block content %}
 
-<form method="POST">
+<form method="POST" action="{{ url_for('schedule.update_schedule', start_time_str=schedule.start_time) }}">
     {{ form.hidden_tag() }}
     <div class="form-group">
         {{ form.start_time.label(class="form-control-label") }}
@@ -12,6 +11,6 @@
         {{ form.end_time.label(class="form-control-label") }}
         {{ form.end_time(class="form-control") }}
     </div>
-    {{ form.submit(class="btn btn-primary")}}
+    {{ form.submit(class="btn btn-primary", value="Update")}}
 </form>
 {% endblock %}

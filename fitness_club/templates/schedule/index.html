@@ -17,7 +17,8 @@
                 <td>{{ schedule.start_time.strftime('%Y-%m-%d %H:%M') }}</td>
                 <td>{{ schedule.end_time.strftime('%Y-%m-%d %H:%M') }}</td>
                 <td>
-                    <a href="{{ url_for('schedule.edit_schedule', trainer_id=schedule.trainer_id) }}">Edit</a>
+                    <a href="{{ url_for('schedule.show_schedule', start_time_str=schedule.start_time) }}" class="btn btn-primary" >Show</a>
+                    <a href="{{ url_for('schedule.edit_schedule', start_time_str=schedule.start_time) }}" class="btn btn-primary" >Edit</a>
                 </td>
             </tr>
             {% endfor %}

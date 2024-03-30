@@ -4,6 +4,7 @@ from flask import Blueprint
 from fitness_club import db
 from fitness_club.models import Schedule
 from fitness_club.schedule_forms import ScheduleForm
+from datetime import datetime
 
 schedule = Blueprint("schedule", __name__)
 
@@ -46,27 +47,38 @@ def create_schedule():
     return redirect(url_for("schedule.schedule_index"))
 
 
-@schedule.route("/<int:trainer_id>/edit", methods=['GET'])
+@schedule.route("/<start_time_str>", methods=['GET'])
 @login_required
-def edit_schedule(trainer_id):
+def show_schedule(start_time_str):
+    """ This route shows a schedule. """
+    if current_user.role != "Trainer":
+        return redirect(url_for("home.index"))
+    # start_time = datetime.strptime(start_time_str, "%Y-%m-%d%H%M")
+    schedule = Schedule.query.filter_by(start_time=start_time_str).first()
+    return render_template("schedule/show.html", schedule=schedule)
+
+
+@schedule.route("/<start_time_str>/edit", methods=['GET'])
+@login_required
+def edit_schedule(start_time_str):
     """ This route renders the edit schedule page. """
     if current_user.role != "Trainer":
         return redirect(url_for("home.index"))
-    schedule = Schedule.query.get(trainer_id)
+    schedule = Schedule.query.get((current_user.trainer_id, start_time_str))
     if schedule.trainer_id != current_user.trainer_id:
         flash("Access denied", "danger")
         return redirect(url_for("schedule.schedule_index"))
     form = ScheduleForm(obj=schedule)
-    return render_template("schedule/edit.html", form=form)
+    return render_template("schedule/edit.html", form=form, schedule=schedule)
 
 
-@schedule.route("/<int:trainer_id>/update", methods=['POST'])
+@schedule.route("/<start_time_str>/update", methods=['POST', 'GET'])
 @login_required
-def update_schedule(trainer_id):
+def update_schedule(start_time_str):
     """ This route updates a schedule. """
     if current_user.role != "Trainer":
         return redirect(url_for("home.index"))
-    schedule = Schedule.query.get(trainer_id)
+    schedule = Schedule.query.get((current_user.trainer_id, start_time_str)) #query by composite primary key
     if schedule.trainer_id != current_user.trainer_id:
         flash("Access denied", "danger")
         return redirect(url_for("schedule.schedule_index"))
@@ -77,6 +89,7 @@ def update_schedule(trainer_id):
         db.session.commit()
         flash("Schedule updated successfully", "success")
     return redirect(url_for("schedule.schedule_index"))
+    # return redirect(url_for("schedule.show_schedule", start_time_str=start_time_str))
 
         
 

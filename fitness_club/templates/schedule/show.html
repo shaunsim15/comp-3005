@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+{% block content %}
+    <div class="container">
+        <h2>Schedule Details</h2>
+        <div class="card">
+            <div class="card-body">
+
+                <h5 class="card-title">Start Time:</h5>
+                <p class="card-text">
+                    {{ schedule.start_time.strftime('%d %B, %Y, %H:%M') }}
+                </p>
+
+                <h5 class="card-title">End Time:</h5>
+                <p class="card-text">
+                    {{ schedule.end_time.strftime('%d %B, %Y, %H:%M') }}
+                </p>
+            </div>
+        </div>
+
+        <a href="{{ url_for('schedule.edit_schedule', start_time_str=schedule.start_time) }}" class="btn btn-primary">Edit Schedule</a>
+    </div>
+{% endblock %}
