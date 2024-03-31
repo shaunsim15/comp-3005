@@ -1,6 +1,9 @@
 {% extends "base.html" %}
 {% block title %}New Schedule{% endblock %}
 {% block content %}
+
+<h4 class="display-4 py-3 mx-auto">Create a New Schedule</h4>
+
 <form method="POST" action="{{ url_for('schedule.create_schedule') }}">
     {{ form.hidden_tag() }}
     <div class="form-group">

@@ -1,29 +1,29 @@
 {% extends "base.html" %}
-
+{% block title %}Schedules{% endblock %}
 {% block content %}
-<div class="container">
-    <h2>My Schedules</h2>
-    <table class="table">
-        <thead>
-            <tr>
-                <th>Start Time</th>
-                <th>End Time</th>
-                <th>Actions</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for schedule in schedules %}
-            <tr>
-                <td>{{ schedule.start_time.strftime('%Y-%m-%d %H:%M') }}</td>
-                <td>{{ schedule.end_time.strftime('%Y-%m-%d %H:%M') }}</td>
-                <td>
-                    <a href="{{ url_for('schedule.show_schedule', start_time_str=schedule.start_time) }}" class="btn btn-primary" >Show</a>
-                    <a href="{{ url_for('schedule.edit_schedule', start_time_str=schedule.start_time) }}" class="btn btn-primary" >Edit</a>
-                </td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
-    <a href="{{ url_for('schedule.new_schedule') }}" class="btn btn-primary">Add New Schedule</a>
-</div>
+
+<h3 class="display-4 py-3 mx-auto">Schedules</h3>
+
+<table class="table table-bordered">
+    <thead class="thead-dark">
+        <tr>
+            <th>ID</th>
+            <th>Name</th>
+            <th>Start Time</th>
+            <th>End Time</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for schedule in schedules %}
+        <tr>
+            <td>{{ loop.index }}</td>
+            <td><a href="{{ url_for('schedule.show_schedule', start_time_str=schedule.start_time) }}">Schedule {{ loop.index }}</a></td>
+            <td>{{ schedule.start_time.strftime('%d %B, %Y, %H:%M') }}</td>
+            <td>{{ schedule.end_time.strftime('%d %B, %Y, %H:%M') }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+<a class="btn btn-primary" href="{{ url_for('schedule.new_schedule') }}" role="button">Create new Schedule</a>
+
 {% endblock %}
