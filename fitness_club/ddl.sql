@@ -47,9 +47,9 @@ CREATE TABLE member_achievement(
     date DATE,
     PRIMARY KEY (member_id, achievement_id),
     FOREIGN KEY (member_id) REFERENCES member
-        ON DELETE SET CASCADE,
+        ON DELETE CASCADE,
     FOREIGN KEY (achievement_id) REFERENCES achievement
-        ON DELETE SET CASCADE
+        ON DELETE CASCADE
 );
 
 CREATE TABLE room(

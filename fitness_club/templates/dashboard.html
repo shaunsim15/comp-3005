@@ -4,6 +4,11 @@
 
 <h1 align="center">Dashboard</h1>
 <p>Welcome to the Fitness Club Dashboard, {{ logged_user.first_name }}!</p>
+<h2> Health Statistics</h2>
+
+<p style="font-size: 20px;">Average Weight: {% if average_weight is not none %}{{ '{:.2f}'.format(average_weight) }} kg{% else %}N/A{% endif %}</p> 
+
+
 
 <h2>Most Recent Achievements</h2>
 <table class="table">
