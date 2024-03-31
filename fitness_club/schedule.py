@@ -109,7 +109,7 @@ def edit_schedule(start_time_str):
     return render_template("schedule/edit.html", form=form, schedule=schedule)
 
 
-@schedule.route("/<start_time_str>/update", methods=['POST', 'GET'])
+@schedule.route("/<start_time_str>/update", methods=['POST'])
 @login_required
 def update_schedule(start_time_str):
     """ This route updates a schedule. """
