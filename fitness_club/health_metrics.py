@@ -2,7 +2,7 @@ from flask import redirect, url_for, render_template, flash
 from flask_login import login_required, current_user
 from fitness_club import db
 from fitness_club.models import WeightLog, Member
-from fitness_club.dashboard_forms import LogWeightForm, HeightForm
+from fitness_club.health_metrics_forms import LogWeightForm, HeightForm
 from flask import Blueprint
 from datetime import datetime
 
