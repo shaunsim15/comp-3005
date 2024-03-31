@@ -19,7 +19,7 @@ def schedule_index():
     return render_template("schedule/index.html", schedules=schedules)
 
 
-@schedule.route("/new", methods=['GET', 'POST'])
+@schedule.route("/new", methods=['GET'])
 @login_required
 def new_schedule():
     """ This route renders the new schedule page. """
@@ -54,11 +54,10 @@ def has_existing_session(trainer_id, new_start_time, new_end_time):
         Session.start_time >= new_start_time,
         Session.end_time <= new_end_time
     ).first()
-
     return existing_session is not None
 
 
-@schedule.route("/", methods=['POST', 'GET'])
+@schedule.route("/create", methods=['POST'])
 @login_required
 def create_schedule():
     """ This route creates a new schedule. """
