@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+{% block title %} Schedule at {{ schedule.start_time.strftime('%Y%m%d') }} {% endblock %}
+{% block content %}
+<h5 class="display-4 py-3 mx-auto">Schedule for {{ schedule.start_time.strftime('%d %B, %Y') }} at {{ schedule.start_time.strftime('%H:%M') }}</h5>
+   
+<div class="form-group">
+    <label>Start Time</label>
+    <input type="text" class="form-control" value="{{ schedule.start_time.strftime('%d %B, %Y, %H:%M') }}" style="caret-color: transparent;" disabled readonly>
+</div>
+<div class="form-group">
+    <label>End Time</label>
+    <input type="text" class="form-control" value="{{ schedule.end_time.strftime('%d %B, %Y, %H:%M') }}" style="caret-color: transparent;" disabled readonly>
+</div>
+
+<a class="btn btn-primary" href="{{ url_for('schedule.edit_schedule', start_time_str=schedule.start_time) }}" role="button">Edit Schedule</a>
+<a class="btn btn-danger" href="{{ url_for('schedule.delete_schedule', start_time_str=schedule.start_time) }}" role="button">Delete Schedule</a>
+{% endblock %}

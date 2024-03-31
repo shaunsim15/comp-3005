@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+{% block content %}
+
+<h4 class="display-4 py-3 mx-auto">Edit Schedule</h4>
+
+<form method="POST" action="{{ url_for('schedule.update_schedule', start_time_str=schedule.start_time) }}">
+    {{ form.hidden_tag() }}
+    <div class="form-group">
+        {{ form.start_time.label(class="form-control-label") }}
+        {{ form.start_time(class="form-control") }}
+    </div>
+    <div>
+        {{ form.end_time.label(class="form-control-label") }}
+        {{ form.end_time(class="form-control") }}
+    </div>
+    {{ form.submit(class="btn btn-primary", value="Update")}}
+</form>
+{% endblock %}
