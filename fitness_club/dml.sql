@@ -34,7 +34,8 @@ VALUES
 ('5 Sessions Paid For'),
 ('10 Sessions Paid For');
 
--- I'm commenting this out because this data isn't actually consistent with what sessions have been created / paid for. Let the trigger handle that logic
+-- I'm commenting this out because this data isn't actually consistent with what sessions have been created / paid for. Let the trigger handle that logic.
+-- But I'm leaving it here so the TA can see what member_achievements might look like.
 -- INSERT INTO member_achievement (member_id, achievement_id, date)
 -- VALUES
 -- (1, 2, '2024-03-10'),
@@ -84,29 +85,22 @@ VALUES
 ('Session 9', '2024-03-28 19:30:00', '2024-03-28 20:30:00', false, 20.00, 3, 3);
 
 
--- IF you change this data, please change the UPDATE statement below
+
 INSERT INTO member_session (member_id, session_id, has_paid_for)
 VALUES
-(1, 1, true),
+(1, 1, false),
 (1, 3, false),
 (1, 4, false),
 (1, 7, false),
 (2, 2, true),
 (3, 3, false),
-(1, 8, true),
-(1, 9, true);
+(1, 8, false),
+(1, 9, false);
 
 -- These dummy updates are just to cause the trigger to fire, since it doesn't fire on inserts; only on updates
--- Update each record where has_paid_for = true to .... has_paid_for = true. Can't make the condition "WHERE has_paid_for = true;" because this would do bulk update, not row by row
 UPDATE member_session
 SET has_paid_for = true
 WHERE has_paid_for = true;
-
--- UPDATE member_session
--- SET has_paid_for = true
--- WHERE (member_id = 1 AND session_id = 1)
--- OR (member_id = 1 AND session_id = 2)
--- OR (member_id = 2 AND session_id = 2);
 
 
 INSERT INTO routine (name, calories_burnt)
