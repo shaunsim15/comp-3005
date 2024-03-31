@@ -6,18 +6,15 @@ from fitness_club.session_forms import MemberPaidForm, RoutineCountForm, Session
 from flask_login import current_user, login_required
 from flask import Blueprint, render_template, redirect, url_for, request, flash
 from sqlalchemy import or_, union
-from sqlalchemy.orm import sessionmaker # https://www.geeksforgeeks.org/sqlalchemy-orm-creating-session/
 
 session = Blueprint('session', __name__) # 'session' is the name of the blueprint. __name__ represents the name of the current module. This variable is exported to __init__.py https://flask.palletsprojects.com/en/2.0.x/tutorial/views/
 
 # INDEX ROUTE
-@session.route('/', methods=['GET']) # '/' is a URL to get to the index view.
-@session.route('/index', methods=['GET']) # '/index' is also a URL to get to the index view.
-@login_required # This means a user must be logged in to use this view / route https://flask-login.readthedocs.io/en/latest/#login-example
+@session.route('/', methods=['GET']) 
+@session.route('/index', methods=['GET']) 
+@login_required 
 def sessions():
-    if current_user.role == 'Member': # 'Role' is a custom method we defined on each of the three models.
-        # https://stackoverflow.com/questions/7942547/using-or-in-sqlalchemy
-        # https://www.slingacademy.com/article/left-outer-join-in-sqlalchemy/
+    if current_user.role == 'Member': 
         sessions = Session.query.outerjoin(Session.members).filter(
             or_(
                 Session.members.any(member_id=current_user.member_id), 
@@ -49,15 +46,9 @@ def session_show(session_id):  # Get the session_id used in the GET request URL
     trainer_name = trainer.first_name + " " + trainer.last_name
 
     # Get Routine data to show in the view
-    sess = db.session # https://flask-sqlalchemy.palletsprojects.com/en/3.0.x/quickstart/#query-the-data
-    query_result = sess.query(Routine, SessionRoutine).join(SessionRoutine).filter(SessionRoutine.session_id == session_id) # https://stackoverflow.com/questions/6044309/sqlalchemy-how-to-join-several-tables-by-one-query
+    sess = db.session 
+    query_result = sess.query(Routine, SessionRoutine).join(SessionRoutine).filter(SessionRoutine.session_id == session_id)
     routines_data = [{'routine_id': routine.routine_id, 'routine_name': routine.name, 'routine_count': session_routine.routine_count} for routine, session_routine in query_result] # Mapping elements of the query_result array to get an array of objects 
-    # routines_data is an array of dictionaries of the form: [
-    #     {'routine_id': 2, 'routine_name': 'pushups', 'routine_count': 3},
-    #     {'routine_id': 4, 'routine_name': 'situps', 'routine_count': 5},
-    # ]
-    # where each dictionary represents data from a (joined) record in the SessionRoutine table. Each of these records must be associated with a Session having the session_id in the URL.
-    # routines_data is used to populate each FormField (i.e. each RoutineCountForm) of the routines FieldList with initial data, as shown here: https://stackoverflow.com/questions/28375565/add-input-fields-dynamically-with-wtforms
 
     # Get Room data to show in the View
     room_capacity = Room.query.get(session.room_id).capacity if session.room_id is not None else None # Get room_capacity if a Room exists for this session, otherwise room_capacity = None
@@ -71,11 +62,10 @@ def session_show(session_id):  # Get the session_id used in the GET request URL
         # Attempt to get current MemberSession, check if it exists
         query_result = sess.query(Member, MemberSession).join(MemberSession).filter(MemberSession.session_id == session_id, MemberSession.member_id == current_user.member_id).all()
         members_data = [{'member_id': member.member_id, 'member_name': f'{member.first_name} {member.last_name}', 'has_paid_for': 'Yes' if member_session.has_paid_for else 'No'} for member, member_session in query_result]
-        print(members_data)
 
     form = SessionForm(routines=routines_data, members=members_data) # Populate the routines FieldList with initial data, and the members FieldList with initial data 
-    routine_c_form = RoutineCountForm() # Initializes a form, similar to SessionForm. I'm only doing this to get the label, not super important
-    member_p_form = MemberPaidForm() # Initializes a form, similar to SessionForm. I'm only doing this to get the label, not super important
+    routine_c_form = RoutineCountForm()
+    member_p_form = MemberPaidForm()
     form.room_id.data = session.room_id
     form.room_id.choices = [(room.room_id, room.name) for room in Room.query.all()]
     form.room_id.choices.insert(0, (-1, 'None')) # Create a dummy room option with room_id = -1 and name = 'None'. Insert at index 0
@@ -94,27 +84,19 @@ def session_new():
     # Get Routine data to show in the view
     query_result = Routine.query.all()
     routines_data = [{'routine_id': routine.routine_id, 'routine_name': routine.name, 'routine_count': 0} for routine in query_result] # Mapping elements of the query_result array to get an array of objects 
-    # routines_data is an array of dictionaries of the form: [
-    #     {'routine_id': 2, 'routine_name': 'pushups', 'routine_count': 0},
-    #     {'routine_id': 4, 'routine_name': 'situps', 'routine_count': 0},
-    # ]
-    # where each dictionary represents a Routine in the Routines table. We list ALL Routines.
-    # routines_data is used to populate each FormField (i.e. each RoutineCountForm) of the routines FieldList with initial data, as shown here: https://stackoverflow.com/questions/28375565/add-input-fields-dynamically-with-wtforms
+    
     query_result = Member.query.all()
     members_data = [{'member_id': member.member_id, 'member_name': f'{member.first_name} {member.last_name}', 'add_to_session': 'No'} for member in query_result]
     
     form = SessionForm(routines=routines_data, members=members_data)
     
-    routine_c_form = RoutineCountForm() # Initializes a form, similar to SessionForm. I'm only doing this to get the label, not super important
-    member_p_form = MemberPaidForm() # Initializes a form, similar to SessionForm. I'm only doing this to get the label, not super important
+    routine_c_form = RoutineCountForm()
+    member_p_form = MemberPaidForm() 
 
     # Here, defining dropdown choices is necessary to show a dropdown for Trainers in the view, as opposed to forcing them to manually enter a trainer_id. Same for Rooms.
     form.trainer_id.choices = [(trainer.trainer_id, trainer.first_name + " " + trainer.last_name) for trainer in Trainer.query.all()]
     form.room_id.choices = [(room.room_id, room.name) for room in Room.query.all()]
     form.room_id.choices.insert(0, (-1, 'None')) # Create a dummy room option with room_id = -1 and name = 'None'. Insert at index 0
-
-
-    # ASIDE: If we don't want a Member to be able to populate certain fields, we can delete them for Members, but not for Admins etc: https://wtforms.readthedocs.io/en/3.1.x/specific_problems/#removing-fields-per-instance
     
     # This code runs if form validation is successful
     if form.validate_on_submit():
@@ -149,7 +131,7 @@ def session_new():
             
             # Third, add MemberSessions to the db
             member_count = 0
-            for member in form.members.data: # each member probs looks sth like {'member_id': 1, 'add_to_session': 'No'}
+            for member in form.members.data: # each member looks sth like {'member_id': 1, 'add_to_session': 'No'}
                 if member['add_to_session'] == 'Yes': # If this member is supposed to be added to the session
                     # For personal bookings, this block checks that no more than 1 member can be added to the Session
                     if not is_group_booking_to_add:
@@ -173,8 +155,6 @@ def session_new():
         for error in errors:
             flash(f"Error in field '{getattr(form, field).label.text}': {error}", "danger")
     
-    # ON GET: Go to the below page # https://stackoverflow.com/questions/69529247/how-do-i-pre-fill-a-flask-wtforms-form-with-existing-data-for-an-edit-profile
-    # ON POST: If form validation unsuccessful, also go to the below page (error messsages should be flashed too)
     return render_template("session/new.html", form=form, routine_c_form=routine_c_form, member_p_form=member_p_form, is_member=is_member)
 
 # EDIT ROUTE
@@ -194,16 +174,8 @@ def session_edit(session_id):
             abort(404)
 
     # Get Routine data to show in the view
-    sess = db.session # https://flask-sqlalchemy.palletsprojects.com/en/3.0.x/quickstart/#query-the-data
     query_result = Routine.query.all() 
     routines_data = [{'routine_id': routine.routine_id, 'routine_name': routine.name, 'routine_count': 0} for routine in query_result] # Mapping elements of the query_result array to get an array of objects 
-    # routines_data is an array of dictionaries of the form: [
-    #     {'routine_id': 2, 'routine_name': 'pushups', 'routine_count': 3},
-    #     {'routine_id': 4, 'routine_name': 'situps', 'routine_count': 5},
-    # ]
-    # where each dictionary represents data from a (joined) record in the SessionRoutine table. Each of these records must be associated with a Session having the session_id in the URL.
-    # routines_data is used to populate each FormField (i.e. each RoutineCountForm) of the routines FieldList with initial data, as shown here: https://stackoverflow.com/questions/28375565/add-input-fields-dynamically-with-wtforms
-
 
     # Get Room data to show in the View
     room_capacity = Room.query.get(session.room_id).capacity if session.room_id is not None else None # Get room_capacity if a Room exists for this session, otherwise room_capacity = None
@@ -227,8 +199,8 @@ def session_edit(session_id):
 
 
     form = SessionForm(routines=routines_data, members=members_data) # Populate the routines FieldList with initial data, and the members FieldList with initial data 
-    routine_c_form = RoutineCountForm() # Initializes a form, similar to SessionForm. I'm only doing this to get the label, not super important
-    member_p_form = MemberPaidForm() # Initializes a form, similar to SessionForm. I'm only doing this to get the label, not super important 
+    routine_c_form = RoutineCountForm() 
+    member_p_form = MemberPaidForm()
 
 
     # Here, defining dropdown choices is necessary to show a dropdown for Trainers in the view, as opposed to forcing them to manually enter a trainer_id. Same for Rooms.
@@ -239,12 +211,10 @@ def session_edit(session_id):
     form.room_id.choices.insert(0, (-1, 'None')) # Create a dummy room option with room_id = -1 and name = 'None'. Insert at index 0
     if is_member:
         form.room_id.data = -1 if session.room_id is None else session.room_id
-    print(form.room_id.choices)
-    # Need to prevent changing room_id from something to None if there's already a Member? I think no need.
+
     
     # This code runs if form validation is successful
     if form.validate_on_submit():
-        print("submit validaiton done")
         # First, update the Session in the db
         session.name=form.name.data
         session.start_time=form.start_time.data
@@ -268,11 +238,11 @@ def session_edit(session_id):
                     db.session.add(session_routine)
 
         # Third, add or remove or do nothing with each MemberSession from the db, based on 'add_to_session'. We never update MemberSessions, because can't change has_paid_for. I assume the form stops a Member from updating other Members' data!!
-        for member in form.members.data: # each member probs looks sth like {'member_id': 1, 'add_to_session': 'No'}
+        for member in form.members.data: # each member looks sth like {'member_id': 1, 'add_to_session': 'No'}
             # If MemberSession already exists, we delete it or do nothing:
             member_sesh = MemberSession.query.filter_by(member_id=member['member_id'], session_id=session_id).first()
             if member_sesh:
-                if member['add_to_session'] == 'No': # Delete, BUT MUST CHECK THEY HAVENT PAID YET, ELSE SCAM!
+                if member['add_to_session'] == 'No': # Delete, BUT MUST CHECK THEY HAVENT PAID YET!
                     if not member_sesh.has_paid_for:
                         db.session.delete(member_sesh)
                     else:
@@ -294,8 +264,6 @@ def session_edit(session_id):
         for error in errors:
             flash(f"Error in field '{getattr(form, field).label.text}': {error}", "danger")
     
-    # ON GET: Go to the below page # https://stackoverflow.com/questions/69529247/how-do-i-pre-fill-a-flask-wtforms-form-with-existing-data-for-an-edit-profile
-    # ON POST: If form validation unsuccessful, also go to the below page (error messsages should be flashed too)
     return render_template("session/edit.html", form=form, session=session, trainer_name=trainer_name, routine_c_form=routine_c_form, member_p_form=member_p_form, is_member=is_member, room_occupancy=room_occupancy)
 
 # DELETE ROUTE

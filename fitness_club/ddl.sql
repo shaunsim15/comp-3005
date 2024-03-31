@@ -139,6 +139,7 @@ CREATE TABLE admin(
     last_name VARCHAR(20)
 );
 
+-- This is the trigger function that causes the MemberAchievement table to be populated once a member has paid for 1, 5 or 10 sessions.
 CREATE FUNCTION check_paid_sesh_member_achievement()
 returns TRIGGER
 language plpgsql
@@ -166,6 +167,7 @@ $$
     end;
 $$;
 
+-- This is the trigger associated with the above trigger function
 CREATE TRIGGER paid_sesh_member_achievement
 AFTER UPDATE
 ON member_session
