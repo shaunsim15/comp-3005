@@ -2,7 +2,7 @@ from flask import redirect, url_for, render_template, request, flash
 from flask_login import login_required, current_user
 from flask import Blueprint
 from fitness_club import db
-from fitness_club.models import Schedule
+from fitness_club.models import Schedule, Session
 from fitness_club.schedule_forms import ScheduleForm
 from datetime import datetime
 
@@ -28,6 +28,7 @@ def new_schedule():
     form = ScheduleForm()
     return render_template("schedule/new.html", form=form)
 
+
 def is_overlapping(trainer_id, new_start_time, new_end_time, current_schedule=None):
     """ This function checks if a schedule overlaps with another schedule. """
     if new_start_time >= new_end_time:
@@ -45,6 +46,17 @@ def is_overlapping(trainer_id, new_start_time, new_end_time, current_schedule=No
             schedule.start_time <= new_start_time < schedule.end_time:
             return True, 'The new schedule overlaps with an existing schedule'
     return False, None
+
+def has_existing_session(trainer_id, new_start_time, new_end_time):
+    """ This function checks if a session already exists for the trainer. """
+    existing_session = Session.query.filter(
+        Session.trainer_id == trainer_id,
+        Session.start_time >= new_start_time,
+        Session.end_time <= new_end_time
+    ).first()
+
+    return existing_session is not None
+
 
 @schedule.route("/", methods=['POST', 'GET'])
 @login_required
@@ -119,15 +131,34 @@ def update_schedule(start_time_str):
         if overlapping:
             flash(message, "danger")
             return redirect(url_for("schedule.edit_schedule", start_time_str=start_time_str))
+        if has_existing_session(current_user.trainer_id, new_start_time, new_end_time):
+            flash("Cannot update this schedule as a session is planned during this time", "danger")
+            return redirect(url_for("schedule.edit_schedule", start_time_str=start_time_str))
         else:
             schedule.start_time = form.start_time.data
             schedule.end_time = form.end_time.data
             db.session.commit()
             flash("Schedule updated successfully", "success")
-    return redirect(url_for("schedule.schedule_index"))
-    # return redirect(url_for("schedule.show_schedule", start_time_str=start_time_str))
+    return redirect(url_for("schedule.show_schedule", start_time_str=start_time_str))
 
-        
+
+@schedule.route("/<start_time_str>/delete", methods=['POST', 'GET'])
+@login_required
+def delete_schedule(start_time_str):
+    """ This route deletes a schedule. """
+    if current_user.role != "Trainer":
+        return redirect(url_for("home.index"))
+    schedule = Schedule.query.get((current_user.trainer_id, start_time_str))
+    if schedule.trainer_id != current_user.trainer_id:
+        flash("Access denied", "danger")
+        return redirect(url_for("schedule.schedule_index"))
+    if has_existing_session(current_user.trainer_id, schedule.start_time, schedule.end_time):
+        flash("Cannot delete this schedule as a session is planned during this time", "danger")
+        return redirect(url_for("schedule.schedule_index"))
+    db.session.delete(schedule)
+    db.session.commit()
+    flash("Schedule deleted successfully", "success")
+    return redirect(url_for("schedule.schedule_index"))
 
 
 
