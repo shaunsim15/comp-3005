@@ -38,7 +38,6 @@ def create_app():
         db.session.execute(text(sql_commands))
         db.session.commit()
 
-        print("hello")
         with open("fitness_club/dml.sql", 'r') as f:
             sql_commands = f.read()
         db.session.execute(text(sql_commands))

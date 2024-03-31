@@ -19,17 +19,21 @@
                 <tbody>
                     {% for subform in form.unpaid_sessions %}
                         {{ subform.hidden_tag() }}
-                        <tr>
+                        <tr class="unpaid {{ loop.index }}">
                             <td>{{ subform.session_id(class="form-control", disabled=true, style="caret-color: transparent;") }}</td>
                             <td>{{ subform.session_name(class="form-control", disabled=true, style="caret-color: transparent;") }}</td>
-                            <td>{{ subform.pricing(class="form-control", disabled=true, style="caret-color: transparent;") }}</td>
-                            <td>{{ subform.payment_choice(class="form-control", value="False") }}</td>
+                            <td>{{ subform.pricing(class="form-control pricing", disabled=true, style="caret-color: transparent;") }}</td>
+                            <td>{{ subform.payment_choice(class="form-control payment-choice", value="False") }}</td>
                         </tr>
                     {% endfor %}
                 </tbody>
             </table>
         </div>
         <div class="form-group">
+            <div>
+                Amount to be paid: 
+                <span class="displayTotal"></span>
+            </div>
             {{ form.submit(class="btn btn-primary") }}
         </div>
     </form>
@@ -52,4 +56,26 @@
             {% endfor %}
         </tbody>
     </table>
+
+    <script>
+        const unpaidRows = Array.from(document.querySelectorAll('.unpaid'));
+        let displayTotalElement = document.querySelector('.displayTotal')
+        let displayTotalValue = "CAD 0";
+        displayTotalElement.textContent = displayTotalValue;
+        let priceChoicePairs = unpaidRows.map(row => [...row.getElementsByClassName('pricing'), ...row.getElementsByClassName('payment-choice')]);
+        priceChoicePairs.forEach( function([priceElement, paymentChoiceElement]) {
+            paymentChoiceElement.addEventListener('change', calculateTotal);
+        });
+
+        function calculateTotal(e) {
+            let total = 0;
+            for (let i = 0; i < priceChoicePairs.length; i++) {
+                if (priceChoicePairs[i][1].value === "Yes") {
+                    total = total + priceChoicePairs[i][0].valueAsNumber;
+                }
+            }
+            total = Math.round(total * 100) / 100
+            displayTotalElement.textContent = `CAD ${total}`;
+        }
+    </script>
 {% endblock %}
