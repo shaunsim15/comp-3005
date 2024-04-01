@@ -36,7 +36,7 @@ def billing_show(member_id):  # Get the member_id used in the GET request URL
     member = Member.query.get_or_404(member_id)
 
     # If you're a Trainer, OR a Member who doesn't own this page
-    if current_user.role == 'Trainer' or (): 
+    if current_user.role == 'Trainer': 
         abort(404)
     elif current_user.role == 'Member': # Check first to prevent Index OOB
         if member_id != current_user.member_id:
@@ -71,13 +71,16 @@ def billing_edit(member_id):
     # Find the Member associated with the member_id
     member = Member.query.get_or_404(member_id)
 
-    # If youre not the Member who owns this page, abort 
-    if current_user.role != 'Member': 
+    is_member = False
+    # If you're a Trainer, OR a Member who doesn't own this page
+    if current_user.role == 'Trainer': 
         abort(404)
-    elif member_id != current_user.member_id:
-        abort(404)
+    elif current_user.role == 'Member': # Check first to prevent Index OOB
+        is_member = True
+        if member_id != current_user.member_id:
+            abort(404)
     
-    sess = db.session # https://flask-sqlalchemy.palletsprojects.com/en/3.0.x/quickstart/#query-the-data
+    sess = db.session
 
     query_result = sess.query(Session, MemberSession).join(MemberSession).filter(MemberSession.member_id == member_id)
     session_data = [{'session_id': session.session_id, 'session_name': session.name, 'pricing': session.pricing, 'has_paid_for': member_session.has_paid_for} for session, member_session in query_result]
@@ -101,7 +104,7 @@ def billing_edit(member_id):
         for sesh in form.unpaid_sessions.data:
             if sesh['payment_choice'] == 'Yes':
                 member_session =  MemberSession.query.filter_by(
-                    member_id=current_user.member_id,
+                    member_id=member_id,
                     session_id=sesh['session_id'],
                     has_paid_for=False # Confirm has_paid_for is False, tho should alrd be.
                 ).first()
@@ -119,4 +122,4 @@ def billing_edit(member_id):
             flash(f"Error in field '{getattr(form, field).label.text}': {error}", "danger")
 
     # If form validation unsuccessful, go to this page (error messsages should be flashed too)
-    return render_template("billing/edit.html", member=member, form=form, billing_subform=billing_subform, paid_session_data=paid_session_data) # paid session data is for display only, not needed as a form
+    return render_template("billing/edit.html", member=member, form=form, billing_subform=billing_subform, paid_session_data=paid_session_data, is_member=is_member) # paid session data is for display only, not needed as a form
