@@ -13,7 +13,13 @@
                         <th>{{ billing_subform.session_id.label }}</th>
                         <th>{{ billing_subform.session_name.label }}</th>
                         <th>{{ billing_subform.pricing.label }}</th>
-                        <th>{{ billing_subform.payment_choice.label }}</th>
+                        <th>{% if is_member %} 
+                                {{ billing_subform.payment_choice.label }}
+                            {% else %}
+                                Do you want to write off the bill for this Session?
+                            {% endif %}
+                            
+                        </th>
                     </tr>
                 </thead>
                 <tbody>
@@ -31,10 +37,14 @@
         </div>
         <div class="form-group">
             <div>
-                Amount to be paid: 
+                Amount to be {% if is_member %} paid{% else %} written off{% endif %}: 
                 <span class="displayTotal"></span>
             </div>
-            {{ form.submit(class="btn btn-primary") }}
+            {% if is_member %}
+                {{ form.submit(class="btn btn-primary submitbutton") }}
+            {% else %}
+                {{ form.submit(class="btn btn-primary submitbutton", value="Write off") }}
+            {% endif %}
         </div>
     </form>
     <h5 class="display-5 py-3 mx-auto"> Paid Sessions</h5>
@@ -58,6 +68,11 @@
     </table>
 
     <script>
+        let isMember = "{{is_member}}";
+        let submitButton = document.querySelector('.submitbutton');
+        if (isMember === 'True') {
+            submitButton.addEventListener('click', askForCardDetails);
+        }
         const unpaidRows = Array.from(document.querySelectorAll('.unpaid'));
         let displayTotalElement = document.querySelector('.displayTotal')
         let displayTotalValue = "CAD 0";
@@ -66,6 +81,10 @@
         priceChoicePairs.forEach( function([priceElement, paymentChoiceElement]) {
             paymentChoiceElement.addEventListener('change', calculateTotal);
         });
+
+        function askForCardDetails(e) {
+            prompt("Please enter your credit card details (not a scam I promise):");
+        }
 
         function calculateTotal(e) {
             let total = 0;

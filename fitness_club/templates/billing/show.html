@@ -44,7 +44,5 @@
             {% endfor %}
         </tbody>
     </table>
-    {% if is_member %}
-        <a class="btn btn-primary py-3" href="{{ member.member_id ~ '/edit' }}" role="button">Go to Payments Page</a>
-    {% endif %}
+    <a class="btn btn-primary py-3" href="{{ member.member_id ~ '/edit' }}" role="button">Go to Payments Page</a>
 {% endblock %}
