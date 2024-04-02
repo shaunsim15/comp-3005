@@ -1,7 +1,7 @@
 import email_validator
 from fitness_club import db, bcrypt, login_manager
 from fitness_club.models import Member, Trainer, Admin
-from flask_login import current_user, login_user, logout_user
+from flask_login import current_user, login_user, logout_user, login_required
 from fitness_club.auth_forms import RegistrationForm, MemberOnlyForm, LoginForm
 from flask import Blueprint, render_template, redirect, url_for, request, flash
 
@@ -44,6 +44,13 @@ def register():
         return redirect(url_for("auth.login"))
 
     return render_template("auth/sign_up.html", form=form, user_role=user_role)
+
+
+# @users.route("/update_profile", methods=("GET", "POST"))
+# @login_required
+# def update_member_profile():
+
+
 
 
 @users.route("/login", methods=("GET", "POST"))

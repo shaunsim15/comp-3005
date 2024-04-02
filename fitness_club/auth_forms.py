@@ -29,6 +29,14 @@ class MemberOnlyForm(RegistrationForm):
     goal_date = StringField('Goal Date', validators=[DataRequired()])
     height = StringField('Height', validators=[DataRequired()])
 
+class UpdateMemberForm(RegistrationForm):
+    """ Form for updating member's information."""
+    goal_weight = StringField('Goal Weight', validators=[DataRequired()])
+    goal_date = StringField('Goal Date', validators=[DataRequired()])
+    height = StringField('Height', validators=[DataRequired()])
+    submit = SubmitField('Update')
+
+
 class LoginForm(FlaskForm):
     """This class represents the form for logging in all users."""
     email = StringField('Email', validators=[DataRequired(), Email()])

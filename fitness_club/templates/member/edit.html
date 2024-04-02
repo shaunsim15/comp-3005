@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+{% block content %}
+
+<h4 class="display-4 py-3 mx-auto">Update Profile</h4>
+
+<form method="POST" action="{{ url_for('member.update_member_profile') }}">
+    {{ form.hidden_tag() }}
+    <div class="form-group">
+        {{ form.first_name.label(class="form-control-label") }}
+        {{ form.first_name(class="form-control") }}
+    </div>
+    <div class="form-group">
+        {{ form.last_name.label(class="form-control-label") }}
+        {{ form.last_name(class="form-control") }}
+    </div>
+    <div>
+        {{ form.email.label(class="form-control-label") }}
+        {{ form.email(class="form-control") }}
+    </div>
+    <div>
+        {{ form.goal_weight.label(class="form-control-label") }}
+        {{ form.goal_weight(class="form-control") }}
+    </div>
+    <div>
+        {{ form.goal_date.label(class="form-control-label") }}
+        {{ form.goal_date(class="form-control") }}
+    </div>
+    <div>
+        {{ form.height.label(class="form-control-label") }}
+        {{ form.height(class="form-control") }}
+    </div>
+    {{ form.submit(class="btn btn-primary", value="Update Profile")}}
+</form>
+{% endblock %}
