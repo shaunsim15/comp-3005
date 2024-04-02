@@ -46,13 +46,6 @@ def register():
     return render_template("auth/sign_up.html", form=form, user_role=user_role)
 
 
-# @users.route("/update_profile", methods=("GET", "POST"))
-# @login_required
-# def update_member_profile():
-
-
-
-
 @users.route("/login", methods=("GET", "POST"))
 def login():
     """ This function logs in a user. """
