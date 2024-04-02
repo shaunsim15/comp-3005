@@ -63,7 +63,7 @@ def update_member_profile():
         db.session.add(current_user)
         db.session.commit()
         flash("Profile updated successfully", "success")
-        return redirect(url_for("member.member_show", member=current_user))
+        return redirect(url_for("home.index"))
     
     elif request.method == "GET":
         form.first_name.data = current_user.first_name
