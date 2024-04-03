@@ -1,7 +1,7 @@
 import email_validator
 from fitness_club import db, bcrypt, login_manager
 from fitness_club.models import Member, Trainer, Admin
-from flask_login import current_user, login_user, logout_user
+from flask_login import current_user, login_user, logout_user, login_required
 from fitness_club.auth_forms import RegistrationForm, MemberOnlyForm, LoginForm
 from flask import Blueprint, render_template, redirect, url_for, request, flash
 
