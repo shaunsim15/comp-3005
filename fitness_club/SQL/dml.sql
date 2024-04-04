@@ -1,3 +1,4 @@
+-- The unhashed password for each user is written as a comment on each line. Use these to login.
 INSERT INTO member (first_name, last_name, email, password, goal_weight, goal_date, height)
 VALUES
 ('John', 'Doe', 'johndoe@gmail.com', '$2b$12$HKOaYFobfQYbRyaMvLVcweG38Y1s3X/Rcr3bIZbvuyDLSSAIuWmAS', 70.5, '2024-06-01', 175), -- 'password123'
@@ -34,8 +35,8 @@ VALUES
 ('5 Sessions Paid For'),
 ('10 Sessions Paid For');
 
--- I'm commenting this out because this data isn't actually consistent with what sessions have been created / paid for. Let the trigger handle that logic.
--- But I'm leaving it here so the TA can see what member_achievements might look like.
+-- I'm commenting this out because data in MemberAchievement should be populated by the trigger function when Members complete Achievements. This table should have no initial data.
+-- But I'm leaving in some example DML so the TA can see what member_achievement records look like.
 -- INSERT INTO member_achievement (member_id, achievement_id, date)
 -- VALUES
 -- (1, 2, '2024-03-10'),
@@ -102,7 +103,8 @@ UPDATE member_session
 SET has_paid_for = true
 WHERE has_paid_for = true;
 
-
+-- Note that each calories_burnt figure is for one unit of that routine. E.g. 200 calories burnt after doing 1 pushup.
+-- calories_burnt isn't really used in our app currently, but it would be cool in future to report data on calories burnt in the MemberDashboard
 INSERT INTO routine (name, calories_burnt)
 VALUES
 ('Push Ups', 200),
@@ -126,7 +128,7 @@ VALUES
 ('Bicep Curls', 200),
 ('Calf Raises', 180);
 
--- Inserting data into the session_routine table
+
 INSERT INTO session_routine (session_id, routine_id, routine_count)
 VALUES
 (1, 1, 1), 
@@ -189,7 +191,7 @@ VALUES
 (4, '2024-03-16 09:00:00', '2024-03-16 13:00:00'),
 (4, '2024-03-16 14:00:00', '2024-03-16 18:00:00'),
 (4, '2024-03-16 19:00:00', '2024-03-16 23:00:00'),
-(4, '2024-03-17 00:00:00', '2024-03-17 23:59:59'),
+(4, '2024-03-17 00:00:00', '2024-12-31 23:59:59'), -- Make Kevin Clark availabile all year round, for ease of testing
 (5, '2024-03-16 10:00:00', '2024-03-16 14:00:00'),
 (5, '2024-03-16 15:00:00', '2024-03-16 19:00:00'),
 (6, '2024-03-16 11:00:00', '2024-03-16 15:00:00'),
@@ -206,8 +208,8 @@ VALUES
 INSERT INTO equipment (name, last_maintained_date, days_in_maintenance_interval, room_id)
 VALUES
 ('Treadmill', '2024-03-01', 30, 1),
-('Dumbbells', '2024-02-15', 60, 2),
-('Yoga Mats', '2024-03-05', 45, 3);
+('Rowing Machine', '2024-02-15', 60, 2),
+('Stationary Bike', '2024-03-05', 45, 3);
 
 
 

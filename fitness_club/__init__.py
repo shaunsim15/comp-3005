@@ -33,12 +33,12 @@ def create_app():
     # creates an app context, within which the Flask app and its configurations are available for use. Useful when working with Flask components outside of regular request/response cycle.
     with app.app_context():
         # db.create_all() will create db tables based on models, but we dont want this
-        with open("fitness_club/ddl.sql", 'r') as f:
+        with open("fitness_club/SQL/ddl.sql", 'r') as f:
             sql_commands = f.read()
         db.session.execute(text(sql_commands))
         db.session.commit()
 
-        with open("fitness_club/dml.sql", 'r') as f:
+        with open("fitness_club/SQL/dml.sql", 'r') as f:
             sql_commands = f.read()
         db.session.execute(text(sql_commands))
         db.session.commit()
