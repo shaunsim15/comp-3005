@@ -10,14 +10,27 @@ dashboard = Blueprint("dashboard", __name__)
 @login_required
 def index():
     """ This route renders the dashboard page with recent achievements, sessions, routines, and average weight for all time. """
-    # Retrieve personnel sessions done by the current user
-    past_week_sessions = db.session.query(Session).join(MemberSession, Session.session_id == MemberSession.session_id).filter(MemberSession.member_id == current_user.member_id).filter(
-        Session.is_group_booking == False).all()
 
-    # Retrieve routines done by the current user
-    past_week_routines = db.session.query(Routine, db.func.sum(SessionRoutine.routine_count)).join(SessionRoutine, Routine.routine_id == SessionRoutine.routine_id).join(
-        Session, Session.session_id == SessionRoutine.session_id).join(MemberSession, Session.session_id == MemberSession.session_id).filter(
-            MemberSession.member_id == current_user.member_id).group_by(Routine).all()
+    end_date = datetime.now()
+    start_date = end_date - timedelta(days=7)
+
+    # Query for sessions in the past week
+    past_week_sessions = db.session.query(Session).join(MemberSession, Session.session_id == MemberSession.session_id).filter(
+        MemberSession.member_id == current_user.member_id,
+        Session.is_group_booking == False,
+        Session.start_time >= start_date,
+        Session.start_time <= end_date
+    ).all()
+
+    # Query for routines done by the current user in the past week
+    past_week_routines = db.session.query(Routine, db.func.sum(SessionRoutine.routine_count)).join(
+        SessionRoutine, Routine.routine_id == SessionRoutine.routine_id).join(
+        Session, Session.session_id == SessionRoutine.session_id).join(
+        MemberSession, Session.session_id == MemberSession.session_id).filter(
+        MemberSession.member_id == current_user.member_id,
+        Session.start_time >= start_date,
+        Session.start_time <= end_date
+    ).group_by(Routine).all()
 
     # Retrieve the 5 most recent achievements
     recent_achievements = db.session.query(MemberAchievement, Achievement).join(Achievement, MemberAchievement.achievement_id == Achievement.achievement_id).filter(
