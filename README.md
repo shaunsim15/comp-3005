@@ -55,7 +55,8 @@ setuptools 65.5.0
 
 ### 3. Locations of key project deliverables
 
-- The DDL and DML can be found [here](https://github.com/shaunsim15/comp-3005/tree/main/fitness_club/SQL)
-- The Schema can be found [here](https://github.com/shaunsim15/comp-3005/blob/main/Team_2_Schema.pdf)
+- The Report can be found [here](https://github.com/shaunsim15/comp-3005/blob/main/Team_2_fitness_club_project_report.pdf)
 - The ERD can be found [here](https://github.com/shaunsim15/comp-3005/blob/main/Team_2_ERD.pdf)
+- The Schema can be found [here](https://github.com/shaunsim15/comp-3005/blob/main/Team_2_Schema.pdf)
+- The DDL and DML can be found [here](https://github.com/shaunsim15/comp-3005/tree/main/fitness_club/SQL)
 - The demo video can be found [here](https://youtu.be/J2ayfwEC7Hw?si=ehkjzXtGyfjGzpF_)
